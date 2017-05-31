@@ -1,8 +1,8 @@
-import thread2
 
 import threading
 import time
 import thread2
+import thread3
 from pyardrone import ARDrone, at
 import pygame
 import cv2
@@ -19,6 +19,17 @@ class GetNavData(threading.Thread):
         print("Exiting ")
 
 
+class GetCameraFeed(threading.Thread):
+    def __init__(self, threadID):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+
+    def run(self):
+        print("Starting ")
+        thread3.getvideo()
+        print("Exiting ")
+
+
 def init():
     drone = ARDrone()
     drone.send(at.CONFIG('general:navdata_demo', True))
@@ -26,17 +37,20 @@ def init():
     print("send")
     return drone
 
-cam = cv2.VideoCapture('tcp://192.168.1.1:5555')
+
 # Connect to drone and send some commands to it
 drone = init()
 
 drone.navdata_ready.wait()  # wait until NavData is ready
 print("ready")
 # Create new threads
-thread1 = GetNavData(1, drone)
+thread2 = GetNavData(1, drone)
+thread3 = GetCameraFeed(2)
 
 # Start new Threads
-thread1.start()
+thread2.start()
+thread3.start()
+
 pygame.init()
 W, H = 320, 240
 screen = pygame.display.set_mode((W, H))
@@ -130,3 +144,4 @@ while running:
 print("Shutting down...")
 drone.close()
 print("Ok.")
+

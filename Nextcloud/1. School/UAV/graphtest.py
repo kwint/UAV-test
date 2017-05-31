@@ -28,17 +28,17 @@ chunkSize = 100
 maxChunks = 10
 startTime = pg.ptime.time()
 win.nextRow()
-p5 = win.addPlot(colspan=2)
-p5.setLabel('bottom', 'Time', 's')
-p5.setXRange(-5, 0)
-p5.showGrid(x=True, y=True)
-curves = []
-data = np.empty((chunkSize + 1, 2))
-ptr = 0
+plot = win.addPlot(colspan=2)
+plot.setLabel('bottom', 'Time', 's')
+plot.setXRange(-5, 0)
+plot.showGrid(x=True, y=True)
+curves_vx = []
+data_vx = np.empty((chunkSize + 1, 2))
+ptr_vx = 0
 
 
 def update_plot():
-    global p5, data, ptr, curves
+    global plot, data_vx, ptr_vx, curves_vx
     now = pg.ptime.time()
     for c in curves:
         c.setPos(-(now - startTime), 0)
@@ -60,13 +60,13 @@ def update_plot():
     curve.setData(x=data[:i + 2, 0], y=data[:i + 2, 1])
     ptr += 1
 
-curves2 = []
-data2 = np.empty((chunkSize + 1, 2))
-ptr2 = 0
+curves_vy = []
+data_vy = np.empty((chunkSize + 1, 2))
+ptr_vy = 0
 
 
 def update_plot2():
-    global p5, data2, ptr2, curves2
+    global plot, data_vy, ptr_vy, curves_vy
     now = pg.ptime.time()
     for c in curves2:
         c.setPos(-(now - startTime), 0)

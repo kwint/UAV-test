@@ -21,10 +21,10 @@ conn, addr = s.accept()
 
 length = recvall(conn,16)
 stringData = recvall(conn, int(length))
-data = numpy.fromstring(stringData, dtype='uint8')
+data_vx = numpy.fromstring(stringData, dtype='uint8')
 s.close()
 
-decimg = data.reshape((480,640,3))
+decimg = data_vx.reshape((480, 640, 3))
 cv2.imshow('SERVER',decimg)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
