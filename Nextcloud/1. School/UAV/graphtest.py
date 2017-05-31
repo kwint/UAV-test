@@ -10,13 +10,14 @@ from pyqtgraph.Qt import QtCore, QtGui
 import numpy as np
 from pyardrone import ARDrone, at
 
-drone = ARDrone()
-drone.send(at.CONFIG('general:navdata_demo', True))
-drone.send(at.REF(0b0100000000))
-drone.emergency()
-print("send")
-drone.navdata_ready.wait()
-drone.takeoff()
+# drone = ARDrone()
+# drone.send(at.CONFIG('general:navdata_demo', True))
+# drone.send(at.REF(0b0100000000))
+# drone.emergency()
+# print("send")
+# drone.navdata_ready.wait()
+# print("ready")
+# drone.takeoff()
 
 win = pg.GraphicsWindow()
 win.setWindowTitle('pyqtgraph example: Scrolling Plots')
