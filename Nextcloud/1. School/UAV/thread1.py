@@ -1,7 +1,7 @@
 
 import threading
 import time
-import thread2
+import GetData
 import thread3
 from pyardrone import ARDrone, at
 import pygame
@@ -15,7 +15,7 @@ class GetNavData(threading.Thread):
 
     def run(self):
         print("Starting ")
-        thread2.getdata(drone)
+        GetData
         print("Exiting ")
 
 
@@ -38,103 +38,30 @@ def init():
     return drone
 
 
+cv2.namedWindow("hoi")
+drone = 0
 # Connect to drone and send some commands to it
-drone = init()
-
-drone.navdata_ready.wait()  # wait until NavData is ready
-print("ready")
+# drone = init()
+#
+# drone.navdata_ready.wait()  # wait until NavData is ready
+# print("ready")
 # Create new threads
 thread2 = GetNavData(1, drone)
-thread3 = GetCameraFeed(2)
+# thread3 = GetCameraFeed(2)
 
 # Start new Threads
 thread2.start()
-thread3.start()
+# thread3.start()
 
-pygame.init()
-W, H = 320, 240
-screen = pygame.display.set_mode((W, H))
-clock = pygame.time.Clock()
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.KEYUP:
-            drone.hover()
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                drone.send(at.REF(0b0100000000))
-                running = False
-            # takeoff / land
-            elif event.key == pygame.K_RETURN:
-                drone.takeoff()
-            elif event.key == pygame.K_SPACE:
-                drone.land()
-            # emergency
-            elif event.key == pygame.K_BACKSPACE:
-                drone.send(at.REF(0b0100000000))
-            # forward / backward
-            elif event.key == pygame.K_w:
-                drone.move(forward=speed)
-            elif event.key == pygame.K_s:
-                drone.move(backward=speed)
-            # left / right
-            elif event.key == pygame.K_a:
-                drone.move(left=speed)
-            elif event.key == pygame.K_d:
-                drone.move(right=speed)
-            # up / down
-            elif event.key == pygame.K_UP:
-                drone.move(up=speed)
-            elif event.key == pygame.K_DOWN:
-                drone.move(down=speed)
-            # turn left / turn right
-            elif event.key == pygame.K_LEFT:
-                drone.move(ccw=speed)
-            elif event.key == pygame.K_RIGHT:
-                drone.move(cw=speed)
-            # speed
-            elif event.key == pygame.K_1:
-                speed = 0.1
-            elif event.key == pygame.K_2:
-                speed = 0.2
-            elif event.key == pygame.K_3:
-                speed = 0.3
-            elif event.key == pygame.K_4:
-                speed = 0.4
-            elif event.key == pygame.K_5:
-                speed = 0.5
-            elif event.key == pygame.K_6:
-                speed = 0.6
-            elif event.key == pygame.K_7:
-                speed = 0.7
-            elif event.key == pygame.K_8:
-                speed = 0.8
-            elif event.key == pygame.K_9:
-                speed = 0.9
-            elif event.key == pygame.K_0:
-                speed = 1.0
+drone.navdata_ready.wait()  # wait until NavData is ready
+while not drone.state.fly_mask:
+    drone.takeoff()
 
-    try:
-        print("try build in ding")
-        surface = pygame.image.fromstring(drone.frame, (W, H), 'RGB')
-        # battery status
-        hud_color = (255, 0, 0)
-        bat = 100
-        f = pygame.font.Font(None, 20)
-        hud = f.render('Battery: %i%%' % bat, True, hud_color)
-        screen.blit(surface, (0, 0))
-        screen.blit(hud, (10, 10))
-        print("gelukt")
-    except:
-        pass
 
-    pygame.display.flip()
-    clock.tick(50)
-    pygame.display.set_caption("FPS: %.2f" % clock.get_fps())
+
+
 
 print("Shutting down...")
-drone.close()
+
 print("Ok.")
 
