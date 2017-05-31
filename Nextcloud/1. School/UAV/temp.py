@@ -4,6 +4,7 @@ Simple demonstration of TableWidget, which is an extension of QTableWidget
 that automatically displays a variety of tabluar data formats.
 """
 
+import time
 from pyardrone import ARDrone, at
 
 drone = ARDrone()
@@ -14,8 +15,6 @@ drone.navdata_ready.wait()
 print(drone.navdata_ready.wait())
 drone.takeoff()
 print("go")
-
-
 
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
@@ -50,5 +49,5 @@ if __name__ == '__main__':
 
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
         QtGui.QApplication.instance().exec_()
-
+print('landing')
 drone.land()

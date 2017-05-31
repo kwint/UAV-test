@@ -56,6 +56,7 @@ W, H = 320, 240
 screen = pygame.display.set_mode((W, H))
 clock = pygame.time.Clock()
 running = True
+speed = 0.1
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -127,13 +128,6 @@ while running:
         screen.blit(surface, (0, 0))
         screen.blit(hud, (10, 10))
         print("gelukt")
-    except:
-        pass
-    try:
-        print("opencv test")
-        _, img = cam.read()
-        cv2.imshow("test", img)
-        cv2.waitKey(1)
     except:
         pass
 
