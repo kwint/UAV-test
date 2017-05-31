@@ -1,6 +1,3 @@
-import time
-from pyardrone import ARDrone, at
-
 
 # def getdata(drone):
 #     while True:
@@ -17,17 +14,25 @@ import pyqtgraph as pg
 import time
 from pyqtgraph.Qt import QtCore, QtGui
 import numpy as np
-from thread1 import drone
+from pyardrone import ARDrone, at
 
 global  curves_vx, data_vx, ptr_vx, \
         curves_vy, data_vy, ptr_vy, \
         curves_vz, data_vz, ptr_vz
 global drone, maxChunks, startTime, chunkSize, plot
 
+def init():
+    drone = ARDrone()
+    drone.send(at.CONFIG('general:navdata_demo', True))
+    drone.emergency()
+    print("send")
+    return drone
+
+drone = init()
 
 
 win = pg.GraphicsWindow()
-win.setWindowTitle('pyqtgraph example: Scrolling Plots')
+win.setWindowTitle('Plots waren daar plots')
 
 
 # 3) Plot in chunks, adding one new plot curve for every 100 samples
@@ -53,7 +58,7 @@ curves_vz = []
 data_vz = np.empty((chunkSize + 1, 2))
 ptr_vz = 0
 
-
+print("init done")
 
 
 def update_plot_vx():
@@ -134,10 +139,12 @@ def update_plot_vz():
 
 
 def update():
+    print("update")
     update_plot_vx()
     update_plot_vy()
     update_plot_vz()
 
+print("timer")
 timer = pg.QtCore.QTimer()
 timer.timeout.connect(update)
 timer.start(50)
@@ -145,6 +152,6 @@ timer.start(50)
 ## Start Qt event loop unless running in interactive mode or using pyside.
 if __name__ == '__main__':
     import sys
-
+    print("qt event loop")
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
         QtGui.QApplication.instance().exec_()
