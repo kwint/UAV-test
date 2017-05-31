@@ -20,6 +20,7 @@ import pyqtgraph as pg
 import time
 from pyqtgraph.Qt import QtCore, QtGui
 import numpy as np
+
 def getdata(dr):
         global drone, maxChunks, startTime, curves_vx, data_vx, ptr_vx, \
                                             curves_vy, data_vy, ptr_vy, \
