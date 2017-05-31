@@ -129,13 +129,6 @@ while running:
         print("gelukt")
     except:
         pass
-    try:
-        print("opencv test")
-        _, img = cam.read()
-        cv2.imshow("test", img)
-        cv2.waitKey(1)
-    except:
-        pass
 
     pygame.display.flip()
     clock.tick(50)
