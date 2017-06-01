@@ -7,13 +7,13 @@ from pyardrone import ARDrone, at
 
 import cv2
 
-
+print("hallotjes")
 
 def init():
     drone = ARDrone()
     drone.send(at.CONFIG('general:navdata_demo', True))
     drone.emergency()
-    print("send")
+    print("send1")
     return drone
 
 

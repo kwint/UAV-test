@@ -16,10 +16,10 @@ from pyqtgraph.Qt import QtCore, QtGui
 import numpy as np
 from pyardrone import ARDrone, at
 import thread1
+from threading import Thread
 
 global  curves_vx, data_vx, ptr_vx, \
-        curves_vy, data_vy, ptr_vy, \
-        curves_vz, data_vz, ptr_vz
+        curves_vy, data_vy, ptr_vy
 global drone, maxChunks, startTime, chunkSize, plot
 
 
@@ -27,7 +27,7 @@ def init():
     drone = ARDrone()
     drone.send(at.CONFIG('general:navdata_demo', True))
     drone.emergency()
-    print("send")
+    print("send2")
     return drone
 
 drone = init()
@@ -114,51 +114,17 @@ def update_plot_vy():
     ptr_vy += 1
 
 
-def update_plot_vz():
-    print("update vz")
-    global plot, data_vz, ptr_vz, curves_vz, startTime, chunkSize, maxChunks
-    now = pg.ptime.time()
-    for c in curves_vz:
-        c.setPos(-(now - startTime), 0)
-
-    i = ptr_vz % chunkSize
-    if i == 0:
-        curve3 = plot.plot(pen=(255, 0, 0))
-        curves_vz.append(curve3)
-        last = data_vz[-1]
-        data_vz = np.empty((chunkSize + 1, 2))
-        data_vz[0] = last
-        while len(curves_vz) > maxChunks:
-            c = curves_vz.pop(0)
-            plot.removeItem(c)
-    else:
-        curve3 = curves_vz[-1]
-    data_vz[i + 1, 0] = now - startTime
-    data_vz[i + 1, 1] = np.random.normal() #drone.navdata.demo.vz
-    curve3.setData(x=data_vz[:i + 2, 0], y=data_vz[:i + 2, 1])
-    ptr_vz += 1
-
-
 def update():
     print("update")
     update_plot_vx()
     update_plot_vy()
-    update_plot_vz()
 
-
-class Thread(pg.QtCore.QThread):
-    newData = pg.QtCore.Signal(object)
-    def run(self):
-            thread1
-            time.sleep(0.05)
 
 timer = pg.QtCore.QTimer()
 timer.timeout.connect(update)
 timer.start(50)
 
-thread = Thread()
-thread.newData.connect(update)
-thread.start()
+thread = Thread(target=thread1)
 
 # Start Qt event loop unless running in interactive mode or using pyside.
 if __name__ == '__main__':
