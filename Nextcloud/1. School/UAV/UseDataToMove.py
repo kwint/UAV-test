@@ -1,7 +1,6 @@
 import time
 from pyardrone import ARDrone, at
-
-
+import ThreadDistance
 def init():
     uav = ARDrone()
     uav.navdata_ready.wait()
