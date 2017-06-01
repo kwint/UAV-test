@@ -27,6 +27,8 @@ drone.land()
 print("LANDING")
 
 exit()
+
+
 # drone.move(backward=speed)
 # print("Backward", speed)
 # time.sleep(sleep)
