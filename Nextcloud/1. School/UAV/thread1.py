@@ -1,8 +1,12 @@
+import pyqtgraph as pg
 import time
-import thread3
+from pyqtgraph.Qt import QtCore, QtGui
+import numpy as np
 from pyardrone import ARDrone, at
 
+
 import cv2
+
 
 
 def init():
@@ -13,7 +17,6 @@ def init():
     return drone
 
 
-cv2.namedWindow("hoi")
 # Connect to drone and send some commands to it
 drone = init()
 #

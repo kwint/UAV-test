@@ -15,13 +15,13 @@ import time
 from pyqtgraph.Qt import QtCore, QtGui
 import numpy as np
 from pyardrone import ARDrone, at
-# import thread1
-import threading
+import thread1
 
 global  curves_vx, data_vx, ptr_vx, \
         curves_vy, data_vy, ptr_vy, \
         curves_vz, data_vz, ptr_vz
 global drone, maxChunks, startTime, chunkSize, plot
+
 
 def init():
     drone = ARDrone()
@@ -31,21 +31,6 @@ def init():
     return drone
 
 drone = init()
-
-
-# class Move(threading.Thread):
-#     def __init__(self, threadID):
-#         threading.Thread.__init__(self)
-#         self.threadID = threadID
-#
-#     def run(self):
-#         print("Starting ")
-#         thread1
-#         print("Exiting ")
-#
-# # thread1 = Move(1)
-# # thread1.start()
-
 
 win = pg.GraphicsWindow()
 win.setWindowTitle('Plots waren daar plots')
@@ -97,7 +82,7 @@ def update_plot_vx():
     else:
         curve = curves_vx[-1]
     data_vx[i + 1, 0] = now - startTime
-    data_vx[i + 1, 1] = drone.navdata.demo.vx
+    data_vx[i + 1, 1] = np.random.normal()  # drone.navdata.demo.vx
     curve.setData(x=data_vx[:i + 2, 0], y=data_vx[:i + 2, 1])
     ptr_vx += 1
 
@@ -124,7 +109,7 @@ def update_plot_vy():
     else:
         curve2 = curves_vy[-1]
     data_vy[i + 1, 0] = now - startTime
-    data_vy[i + 1, 1] = drone.navdata.demo.vy
+    data_vy[i + 1, 1] = np.random.normal() #drone.navdata.demo.vy
     curve2.setData(x=data_vy[:i + 2, 0], y=data_vy[:i + 2, 1])
     ptr_vy += 1
 
@@ -149,7 +134,7 @@ def update_plot_vz():
     else:
         curve3 = curves_vz[-1]
     data_vz[i + 1, 0] = now - startTime
-    data_vz[i + 1, 1] = drone.navdata.demo.vz
+    data_vz[i + 1, 1] = np.random.normal() #drone.navdata.demo.vz
     curve3.setData(x=data_vz[:i + 2, 0], y=data_vz[:i + 2, 1])
     ptr_vz += 1
 
@@ -160,14 +145,23 @@ def update():
     update_plot_vy()
     update_plot_vz()
 
-print("timer")
+
+class Thread(pg.QtCore.QThread):
+    newData = pg.QtCore.Signal(object)
+    def run(self):
+            thread1
+            time.sleep(0.05)
+
 timer = pg.QtCore.QTimer()
 timer.timeout.connect(update)
 timer.start(50)
 
-## Start Qt event loop unless running in interactive mode or using pyside.
+thread = Thread()
+thread.newData.connect(update)
+thread.start()
+
+# Start Qt event loop unless running in interactive mode or using pyside.
 if __name__ == '__main__':
     import sys
-    print("qt event loop")
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
         QtGui.QApplication.instance().exec_()
