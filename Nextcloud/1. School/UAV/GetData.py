@@ -15,8 +15,7 @@ import time
 from pyqtgraph.Qt import QtCore, QtGui
 import numpy as np
 from pyardrone import ARDrone, at
-import vlieg
-from threading import Thread
+from threading
 
 global  curves_vx, data_vx, ptr_vx, \
         curves_vy, data_vy, ptr_vy

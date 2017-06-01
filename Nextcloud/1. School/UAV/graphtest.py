@@ -1,8 +1,11 @@
+import time
+
+import numpy as np
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
-import numpy as np
-import time
-import temp2
+
+from Oud import temp2
+
 win = pg.GraphicsWindow()
 win.setWindowTitle('pyqtgraph example: Scrolling Plots')
 global data
