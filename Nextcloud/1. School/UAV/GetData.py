@@ -15,15 +15,18 @@ import time
 from pyqtgraph.Qt import QtCore, QtGui
 import numpy as np
 from pyardrone import ARDrone, at
-from threading
+import threading
+import vlieg
 
 global  curves_vx, data_vx, ptr_vx, \
         curves_vy, data_vy, ptr_vy
 global drone, maxChunks, startTime, chunkSize, plot
 
+print("getdata hoi")
 
 def init():
     uav = ARDrone()
+    print("ready to wait")
     uav.navdata_ready.wait()
     print("ready")
     uav.send(at.CONFIG('general:navdata_demo', True))
@@ -130,7 +133,18 @@ timer = pg.QtCore.QTimer()
 timer.timeout.connect(update)
 timer.start(50)
 
-thread = Thread(target=vlieg)
+class threadtwee(threading.Thread):
+    def __init__(self, threadID):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+
+    def run(self):
+        print("Starting ")
+        vlieg.process()
+        print("Exiting ")
+
+thread = threadtwee(1)
+thread.start()
 
 # Start Qt event loop unless running in interactive mode or using pyside.
 if __name__ == '__main__':
