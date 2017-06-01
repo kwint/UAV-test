@@ -72,7 +72,7 @@ print("init done")
 
 
 def update_plot_vx():
-    print("update vx")
+    # print("update vx")
     global plot, data_vx, ptr_vx, curves_vx, startTime, chunkSize, maxChunks
     now = pg.ptime.time()
     for c in curves_vx:
@@ -99,7 +99,7 @@ def update_plot_vx():
 
 
 def update_plot_vy():
-    print("update vy")
+    # print("update vy")
     global plot, data_vy, ptr_vy, curves_vy, startTime, chunkSize, maxChunks
     now = pg.ptime.time()
     for c in curves_vy:
@@ -124,7 +124,7 @@ def update_plot_vy():
 
 
 def update():
-    print("update")
+    # print("update")
     update_plot_vx()
     update_plot_vy()
 
@@ -134,16 +134,17 @@ timer.timeout.connect(update)
 timer.start(50)
 
 class threadtwee(threading.Thread):
-    def __init__(self, threadID):
+    def __init__(self, threadID, drone):
         threading.Thread.__init__(self)
         self.threadID = threadID
+        self.drone = drone
 
     def run(self):
         print("Starting ")
-        vlieg.process()
+        vlieg.process(drone)
         print("Exiting ")
 
-thread = threadtwee(1)
+thread = threadtwee(1, drone)
 thread.start()
 
 # Start Qt event loop unless running in interactive mode or using pyside.

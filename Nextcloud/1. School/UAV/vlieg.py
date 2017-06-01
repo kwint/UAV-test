@@ -26,9 +26,8 @@ def init():
 
 
 
-def test():
-    drone = init()
-    #
+def process(drone):
+
     drone.navdata_ready.wait()  # wait until NavData is ready
     print("ready")
     # Create new threads
