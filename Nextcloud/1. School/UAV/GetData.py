@@ -15,6 +15,8 @@ import time
 from pyqtgraph.Qt import QtCore, QtGui
 import numpy as np
 from pyardrone import ARDrone, at
+# import thread1
+import threading
 
 global  curves_vx, data_vx, ptr_vx, \
         curves_vy, data_vy, ptr_vy, \
@@ -29,6 +31,20 @@ def init():
     return drone
 
 drone = init()
+
+
+# class Move(threading.Thread):
+#     def __init__(self, threadID):
+#         threading.Thread.__init__(self)
+#         self.threadID = threadID
+#
+#     def run(self):
+#         print("Starting ")
+#         thread1
+#         print("Exiting ")
+#
+# # thread1 = Move(1)
+# # thread1.start()
 
 
 win = pg.GraphicsWindow()
