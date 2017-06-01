@@ -10,14 +10,12 @@ import cv2
 print("hallotjes")
 
 def init():
-    drone = ARDrone()
-    drone.send(at.CONFIG('general:navdata_demo', True))
-    drone.emergency()
-    print("send1")
-    return drone
+    uav = ARDrone()
+    uav.navdata_ready.wait()
 
+    print("ready2")
+    return uav
 
-# Connect to drone and send some commands to it
 drone = init()
 #
 drone.navdata_ready.wait()  # wait until NavData is ready
@@ -31,6 +29,10 @@ while not drone.state.fly_mask:
     drone.takeoff()
     print("Vlieg op!")
 print("JA baas")
+
+drone.hover()
+print("hover")
+time.sleep(3)
 
 timeout = time.time() + 10
 while True:

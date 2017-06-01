@@ -15,7 +15,7 @@ import time
 from pyqtgraph.Qt import QtCore, QtGui
 import numpy as np
 from pyardrone import ARDrone, at
-import thread1
+import vlieg
 from threading import Thread
 
 global  curves_vx, data_vx, ptr_vx, \
@@ -24,11 +24,18 @@ global drone, maxChunks, startTime, chunkSize, plot
 
 
 def init():
-    drone = ARDrone()
-    drone.send(at.CONFIG('general:navdata_demo', True))
-    drone.emergency()
-    print("send2")
-    return drone
+    uav = ARDrone()
+    uav.navdata_ready.wait()
+    print("ready")
+    uav.send(at.CONFIG('general:navdata_demo', True))
+    time.sleep(0.1)
+    print("send")
+    while uav.state.emergency_mask:
+        print("emergency")
+        uav.send(at.REF(0b0100000000))
+        time.sleep(1)
+    print("ready1")
+    return uav
 
 drone = init()
 
@@ -124,7 +131,7 @@ timer = pg.QtCore.QTimer()
 timer.timeout.connect(update)
 timer.start(50)
 
-thread = Thread(target=thread1)
+thread = Thread(target=vlieg)
 
 # Start Qt event loop unless running in interactive mode or using pyside.
 if __name__ == '__main__':
