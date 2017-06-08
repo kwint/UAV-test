@@ -91,7 +91,7 @@ def update_plot_vx():
     else:
         curve = curves_vx[-1]
     data_vx[i + 1, 0] = now - startTime
-    data_vx[i + 1, 1] = np.random.normal()  # drone.navdata.demo.vx
+    data_vx[i + 1, 1] = drone.navdata.demo.vx
     curve.setData(x=data_vx[:i + 2, 0], y=data_vx[:i + 2, 1])
     ptr_vx += 1
 
@@ -118,7 +118,7 @@ def update_plot_vy():
     else:
         curve2 = curves_vy[-1]
     data_vy[i + 1, 0] = now - startTime
-    data_vy[i + 1, 1] = np.random.normal() #drone.navdata.demo.vy
+    data_vy[i + 1, 1] = drone.navdata.demo.vy
     curve2.setData(x=data_vy[:i + 2, 0], y=data_vy[:i + 2, 1])
     ptr_vy += 1
 
