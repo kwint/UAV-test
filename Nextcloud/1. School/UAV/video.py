@@ -78,10 +78,11 @@ init()
 lower_mask = np.array([0, 4, 148])
 upper_mask = np.array([255, 255, 255])
 i = 1
-cam = cv2.VideoCapture(0)
-ret = True
+cam = cv2.VideoCapture('tcp://192.168.1.1:5555')
+# ret = True
 while True:
-    img = cv2.imread("drone/img" + str(i) + ".jpg")
+    # img = cv2.imread("drone/img" + str(i) + ".jpg")
+    ret, img = cam.read()
     if ret:
 
         thres, b, g, r, b1, g1, r1 = filter_image(img, lower_mask, upper_mask)
