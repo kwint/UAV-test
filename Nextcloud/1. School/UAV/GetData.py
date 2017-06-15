@@ -14,9 +14,9 @@ import pyqtgraph as pg
 import time
 from pyqtgraph.Qt import QtCore, QtGui
 import numpy as np
-from pyardrone import ARDrone, at
-import threading
-import vlieg
+# from pyardrone import ARDrone, at
+# import threading
+# import vlieg
 
 global  curves_vx, data_vx, ptr_vx, \
         curves_vy, data_vy, ptr_vy
@@ -39,7 +39,7 @@ def init():
     print("ready1")
     return uav
 
-drone = init()
+# drone = init()
 
 win = pg.GraphicsWindow()
 win.setWindowTitle('Plots waren daar plots')
@@ -133,19 +133,19 @@ timer = pg.QtCore.QTimer()
 timer.timeout.connect(update)
 timer.start(50)
 
-class threadtwee(threading.Thread):
-    def __init__(self, threadID, drone):
-        threading.Thread.__init__(self)
-        self.threadID = threadID
-        self.drone = drone
+# class threadtwee(threading.Thread):
+#     def __init__(self, threadID, drone):
+#         threading.Thread.__init__(self)
+#         self.threadID = threadID
+#         self.drone = drone
+#
+#     def run(self):
+#         print("Starting ")
+#         vlieg.process(drone)
+#         print("Exiting ")
 
-    def run(self):
-        print("Starting ")
-        vlieg.process(drone)
-        print("Exiting ")
-
-thread = threadtwee(1, drone)
-thread.start()
+# thread = threadtwee(1, drone)
+# thread.start()
 
 # Start Qt event loop unless running in interactive mode or using pyside.
 if __name__ == '__main__':

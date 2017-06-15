@@ -32,7 +32,6 @@ def process(drone):
     print("ready")
     # Create new threads
 
-
     drone.navdata_ready.wait()  # wait until NavData is ready
 
     while not drone.state.fly_mask:
