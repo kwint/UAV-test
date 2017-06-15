@@ -32,3 +32,4 @@ while True:
         print("vx = ", NewVxDistance, "vy = ", NewVyDistance, "TotalX = ", VxDistance, "TotalY = ", VyDistance)
 
         PreviousTime = time.time()
+        PreviousVx = vx

@@ -1,13 +1,8 @@
-import pyqtgraph as pg
 import time
-from pyqtgraph.Qt import QtCore, QtGui
-import numpy as np
 from pyardrone import ARDrone, at
 
-
-import cv2
-
 print("hallotjes")
+
 
 def init():
     uav = ARDrone()
@@ -24,40 +19,48 @@ def init():
     print("ready1")
     return uav
 
+drone = init()
 
+while not drone.state.fly_mask:
+    drone.takeoff()
+    print("Vlieg op!")
+print("JA baas")
 
-def process(drone):
+drone.hover()
+print("hover")
+print("ThreadDistance = Ready for Action")
 
-    drone.navdata_ready.wait()  # wait until NavData is ready
-    print("ready")
-    # Create new threads
+VxDistance = 0
+VyDistance = 0
+PreviousTime = 0
+PreviousVx = 0
+PreviousVy = 0
 
-    drone.navdata_ready.wait()  # wait until NavData is ready
+while True:
+    altitude = drone.navdata.demo.altitude
+    vx = drone.navdata.demo.vx
+    vy = drone.navdata.demo.vy
+    vz = drone.navdata.demo.vz
+    phi = drone.navdata.demo.phi
+    psi = drone.navdata.demo.psi
+    theta = drone.navdata.demo.theta
 
-    while not drone.state.fly_mask:
-        drone.takeoff()
-        print("Vlieg op!")
-    print("JA baas")
+    if vx != PreviousVx:
+        TimeDifference = time.time() - PreviousTime
 
-    drone.hover()
-    print("hover")
-    time.sleep(3)
+        NewVxDistance = TimeDifference * vx
+        VxDistance = VxDistance + NewVxDistance
 
-    timeout = time.time() + 5
-    while True:
-        drone.move(forward=0.2)
-        if time.time() > timeout:
-            break
+        NewVyDistance = TimeDifference * vy
+        VyDistance = VyDistance + NewVyDistance
 
-    timeout = time.time() + 5
-    while True:
-        drone.move(backward=0.2)
-        if time.time() > timeout:
-            break
+        print("vx = ", NewVxDistance, "vy = ", NewVyDistance, "TotalX = ", VxDistance, "TotalY = ", VyDistance)
 
-    print("klaar")
-    while drone.state.fly_mask:
-        drone.land()
-        print("ga landen maat")
+        PreviousTime = time.time()
 
-    print("doei")
+print("klaar")
+while drone.state.fly_mask:
+    drone.land()
+    print("ga landen maat")
+
+print("doei")
