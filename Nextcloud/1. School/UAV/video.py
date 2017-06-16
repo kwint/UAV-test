@@ -89,8 +89,9 @@ upper_mask = np.array([255, 255, 255])
 i = 1
 ret = True
 while True:
-    # img = cv2.imread("drone/img" + str(i) + ".jpg")
-    ret, img = cam.read()
+    img = cv2.imread("drone/img" + str(i) + ".jpg")
+    # ret, img = cam.read()
+    print(ret)
     if ret:
 
         thres, b, g, r, b1, g1, r1 = filter_image(img, lower_mask, upper_mask)
