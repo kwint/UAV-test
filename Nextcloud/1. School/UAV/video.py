@@ -13,7 +13,7 @@ def init():
     drone = ARDrone()
     drone.send(at.CONFIG('general:navdata_demo', True))
     time.sleep(0.1)
-    drone.send(at.CONFIG("video:video_channel", 2))
+    drone.send(at.CONFIG("video:video_channel", 1))
     time.sleep(0.1)
 
     # Create windows and sliders
@@ -81,12 +81,12 @@ def filter_image(img, lower_mask, upper_mask):
     # Return binary image and slider data, so program remebers their position
     return thres, b, g, r, b1, g1, r1
 
+cam = cv2.VideoCapture(('tcp://192.168.1.1:5555'))
 
 init()
 lower_mask = np.array([0, 4, 148])
 upper_mask = np.array([255, 255, 255])
 i = 1
-cam = cv2.VideoCapture(('tcp://192.168.1.1:5555'))
 ret = True
 while True:
     # img = cv2.imread("drone/img" + str(i) + ".jpg")
@@ -173,12 +173,12 @@ while True:
                         distanceToCenter = np.sqrt(dx * dx + dy * dy)
                         cv2.line(img, (cx, cy), (320, 180), (255, 255, 255))
 
-                        if distanceToCenter > 0:
-                            # move right
-                            cv2.putText(img, "Move: Right", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
-                        if distanceToCenter < 0:
-                            # move left
-                            cv2.putText(img, "Move: Left", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
+                        # if distanceToCenter > 0:
+                        #     # move right
+                        #     cv2.putText(img, "Move: Right", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
+                        # if distanceToCenter < 0:
+                        #     # move left
+                        #     cv2.putText(img, "Move: Left", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
 
         cv2.putText(img, str(marker), (10, 50), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 255))
         print("marker = ", marker)

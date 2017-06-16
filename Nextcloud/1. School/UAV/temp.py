@@ -4,6 +4,8 @@ import numpy as np
 from pyardrone import ARDrone, at
 print("import done")
 
+cam = cv2.VideoCapture('tcp://192.168.1.1:5555')
+
 drone = ARDrone()
 drone.send(at.CONFIG('general:navdata_demo', True))
 time.sleep(0.1)
@@ -11,7 +13,7 @@ drone.send(at.CONFIG("video:video_channel", 2))
 time.sleep(0.1)
 print("at done")
 
-cam = cv2.VideoCapture('tcp://192.168.1.1:5555')
+
 
 print("hoi")
 while True:
