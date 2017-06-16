@@ -79,11 +79,10 @@ init()
 lower_mask = np.array([0, 4, 148])
 upper_mask = np.array([255, 255, 255])
 i = 1
-cam = cv2.VideoCapture('tcp://192.168.1.1:5555')
-# ret = True
+cam = cv2.VideoCapture(0)
+ret = True
 while True:
-    # img = cv2.imread("drone/img" + str(i) + ".jpg")
-    ret, img = cam.read()
+    img = cv2.imread("drone/img" + str(i) + ".jpg")
     if ret:
 
         thres, b, g, r, b1, g1, r1 = filter_image(img, lower_mask, upper_mask)
@@ -95,7 +94,7 @@ while True:
 
         hierarchy = hierarchy[0]
         print("hierarchy: ", hierarchy)
-        cnt = 0
+
         marker = 0
         MarkerInArea = True
         area = np.array([[180, 0], [180, 360], [540, 360], [540, 0]])
@@ -104,7 +103,7 @@ while True:
         for component in zip(contours, hierarchy):
             currentContour = component[0]
             currentHierarchy = component[1]
-            # print(cnt, currentHierarchy)
+
             if 100 < cv2.contourArea(currentContour) < 50000:
 
                 print("currentHierarchy: ", currentHierarchy)
@@ -136,7 +135,6 @@ while True:
                             breakNext = True
                             print("breakNext True")
 
-
                         print("Hier ben ik")
                         while True:
                             print(circleHierarchy)
@@ -157,41 +155,23 @@ while True:
                                 print("breakNext True")
 
 
-                    # if currentHierarchy[3] == -1:
-                    #     # print(box)
-                    #     markerspace = box
-                    #     # print(markerspace[0])
-                    #
-                    #     if (markerspace[0][0] > area[0][0] and markerspace[1][0] > area[1][0]) and \
-                    #             (markerspace[2][0] < area[2][0] and markerspace[3][0] < area[3][0]):
-                    #         # cv2.drawContours(img, [markerspace], 0, (0, 0, 255), 2)
-                    #         MarkerInArea = True
-                    #     else:
-                    #         # cv2.drawContours(img, [markerspace], 0, (0, 0, 0), 2)
-                    #         MarkerInArea = False
-                    # else:
-                    #     # cv2.drawContours(img, [box], 0, (0, 255, 0), 2)
-                    #     pass
+                        moments = cv2.moments(MarkerContourOutside)
 
-        if not MarkerInArea:
-            moments = cv2.moments(MarkerContourOutside)
+                        cx = int(moments['m10'] / moments['m00'])
+                        cy = int(moments['m01'] / moments['m00'])
 
-            cx = int(moments['m10'] / moments['m00'])
-            cy = int(moments['m01'] / moments['m00'])
+                        dx = cx - 320
+                        dy = cy - 180
+                        distanceToCenter = np.sqrt(dx * dx + dy * dy)
+                        cv2.line(img, (cx, cy), (320, 180), (255, 255, 255))
 
-            dx = cx - 320
-            dy = cy - 180
-            distanceToCenter = np.sqrt(dx * dx + dy * dy)
-            cv2.line(img, (cx, cy), (320, 180), (255, 255, 255))
+                        if distanceToCenter > 0:
+                            # move right
+                            cv2.putText(img, "Move: Right", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
+                        if distanceToCenter < 0:
+                            # move left
+                            cv2.putText(img, "Move: Left", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
 
-            if distanceToCenter > 0:
-                # move right
-                cv2.putText(img, "Move: Right", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 0))
-            if distanceToCenter < 0:
-                # move left
-                cv2.putText(img, "Move: Left", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 0))
-
-            cnt += 1
         cv2.putText(img, str(marker), (10, 50), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 255))
         print("marker = ", marker)
 
