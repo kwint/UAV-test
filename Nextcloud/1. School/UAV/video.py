@@ -79,7 +79,7 @@ def filter_image(img, lower_mask, upper_mask):
     # Return binary image and slider data, so program remebers their position
     return thres, b, g, r, b1, g1, r1
 print(" 1")
-# cam = cv2.VideoCapture('tcp://192.168.1.1:5555')
+cam = cv2.VideoCapture('tcp://192.168.1.1:5555')
 print(" 2")
 init()
 lower_mask = np.array([0, 4, 148])
@@ -90,7 +90,7 @@ nextMarker = 2
 
 while True:
     img = cv2.imread("drone/img" + str(i) + ".jpg")
-    # ret, img = cam.read()
+    ret, img = cam.read()
     print(ret)
     if ret:
 
