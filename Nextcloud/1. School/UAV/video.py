@@ -3,16 +3,18 @@ import time
 import numpy as np
 from pyardrone import ARDrone, at
 
+import move
+
 def nothing(x):
     pass
 
 
 def init():
-    # drone = ARDrone()
-    # drone.send(at.CONFIG('general:navdata_demo', True))
-    # time.sleep(0.1)
-    # drone.send(at.CONFIG("video:video_channel", 1))
-    # time.sleep(0.1)
+    drone = ARDrone()
+    drone.send(at.CONFIG('general:navdata_demo', True))
+    time.sleep(0.1)
+    drone.send(at.CONFIG("video:video_channel", 1))
+    time.sleep(0.1)
 
     # Create windows and sliders
     cv2.namedWindow("Image", cv2.WINDOW_AUTOSIZE)
@@ -30,6 +32,8 @@ def init():
 
     cv2.createTrackbar('kernel', 'slider', 1, 20, nothing)
     cv2.setTrackbarPos('kernel', 'slider', 2)
+
+    return drone
 
 
 def filter_image(img, lower_mask, upper_mask):
@@ -78,15 +82,25 @@ def filter_image(img, lower_mask, upper_mask):
 
     # Return binary image and slider data, so program remebers their position
     return thres, b, g, r, b1, g1, r1
+
+
+
 print(" 1")
 cam = cv2.VideoCapture('tcp://192.168.1.1:5555')
 print(" 2")
-init()
+drone = init()
 lower_mask = np.array([0, 4, 148])
 upper_mask = np.array([255, 255, 255])
 i = 1
 ret = True
 nextMarker = 2
+speed = 0.2
+
+lookForNextMarker = False
+
+time.sleep(2)
+drone.takeoff()
+time.sleep(5)
 
 while True:
     img = cv2.imread("drone/img" + str(i) + ".jpg")
@@ -164,6 +178,7 @@ while True:
                             # If the marker found is the marker we're looking for. Calculate its distance to the center
                             # of the image
                             if currentMarker == nextMarker:
+                                lookForNextMarker = False
                                 moments = cv2.moments(MarkerContourOutside)
 
                                 cx = int(moments['m10'] / moments['m00'])
@@ -178,22 +193,28 @@ while True:
                                     nextMarker = currentMarker + 1
                                     if nextMarker == 4:
                                         nextMarker = 1
+                                        drone.land()
                                     print("JAAAA IK BEN OP EEN MARKER, LETS MAKE A PICTURE MATES")
+                                    move.takePicture(drone, currentMarker, 1)
+                                    lookForNextMarker = True
 
                                 if dx > 0:
                                     # move right
                                     cv2.putText(img, "Move: Right", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
+                                    drone.move(right=speed)
                                 else:
                                     # move left
                                     cv2.putText(img, "Move: Left", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
+                                    drone.move(left=speed)
 
                                 if dy > 0:
-                                    # move right
+                                    # move back
                                     cv2.putText(img, "Move: back", (10, 100), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
+                                    drone.move(backward=speed)
                                 else:
                                     # move left
                                     cv2.putText(img, "Move: forward", (10, 100), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
-
+                                    drone.move(forward=speed)
                                 # Print more!
 
                                 cv2.putText(img, str(currentMarker), (10, 50), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 255))
@@ -204,6 +225,9 @@ while True:
                             else:
                                 cv2.drawContours(img, [box2], 0, (0, 0, 0), 2)
                                 cv2.drawContours(img, [box], 0, (0, 0, 0), 2)
+
+                            if currentMarker != nextMarker and lookForNextMarker:
+                                drone.move(left=speed)
 
 
         # for component in zip(contours, hierarchy):
