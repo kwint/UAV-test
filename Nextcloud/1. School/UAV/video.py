@@ -96,9 +96,10 @@ ret = True
 nextMarker = 2
 speed = 0.2
 
+lookForNextMarker = False
+
 time.sleep(2)
 drone.takeoff()
-
 time.sleep(5)
 
 while True:
@@ -177,6 +178,7 @@ while True:
                             # If the marker found is the marker we're looking for. Calculate its distance to the center
                             # of the image
                             if currentMarker == nextMarker:
+                                lookForNextMarker = False
                                 moments = cv2.moments(MarkerContourOutside)
 
                                 cx = int(moments['m10'] / moments['m00'])
@@ -191,8 +193,10 @@ while True:
                                     nextMarker = currentMarker + 1
                                     if nextMarker == 4:
                                         nextMarker = 1
+                                        drone.land()
                                     print("JAAAA IK BEN OP EEN MARKER, LETS MAKE A PICTURE MATES")
                                     move.takePicture(drone, currentMarker, 1)
+                                    lookForNextMarker = True
 
                                 if dx > 0:
                                     # move right
@@ -221,6 +225,9 @@ while True:
                             else:
                                 cv2.drawContours(img, [box2], 0, (0, 0, 0), 2)
                                 cv2.drawContours(img, [box], 0, (0, 0, 0), 2)
+
+                            if currentMarker != nextMarker and lookForNextMarker:
+                                drone.move(left=speed)
 
 
         # for component in zip(contours, hierarchy):
