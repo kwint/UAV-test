@@ -6,6 +6,7 @@ import time
 def nothing(x):
     pass
 
+cv2.xfeatures2d.SIFT_create()
 
 def init():
     # Create windows and sliders
@@ -92,6 +93,7 @@ while True:
         im2, contours, hierarchy = cv2.findContours(thres, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
         hierarchy = hierarchy[0]
+        print("hierarchy: ", hierarchy)
         cnt = 0
         marker = 0
         MarkerInArea = True
@@ -103,35 +105,75 @@ while True:
             currentHierarchy = component[1]
             # print(cnt, currentHierarchy)
             if 100 < cv2.contourArea(currentContour) < 50000:
-                print(cv2.contourArea(currentContour))
-                if currentHierarchy[2] > 0 or currentHierarchy[3] > 0:  # if contour has a child or a parent
+
+                print("currentHierarchy: ", currentHierarchy)
+                if currentHierarchy[2] >= 0 and currentHierarchy[3] >= 0:  # if contour has a child and a parent
                     # currentContour should be black square, check if its parent doenst have a parent and its child
                     # doesnt have a child
-
                     rect = cv2.minAreaRect(currentContour)
                     box = cv2.boxPoints(rect)
                     box = np.int0(box)
 
-                    # cv2.putText(img, str(cnt), (box[0][0], box[0][1]), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
-                    if currentHierarchy[2] < 0:  # if contour has no child
-                        marker += 1
-                    if currentHierarchy[3] == -1:
-                        print(box)
-                        markerspace = box
-                        print(markerspace[0])
+                    if hierarchy[currentHierarchy[2]][2] < 0 and hierarchy[currentHierarchy[3]][3] < 0:
+                        # Probably found a marker, yeey!
+                        MarkerContourOutside = contours[currentHierarchy[3]]
+                        MarkerContourInside = currentContour
+                        print("Contour ding: ", cv2.contourArea(MarkerContourInside)/cv2.contourArea(MarkerContourOutside))
+                        rect2 = cv2.minAreaRect(MarkerContourOutside)
+                        box2 = cv2.boxPoints(rect2)
+                        box2 = np.int0(box2)
+                        cv2.drawContours(img, [box2], 0, (0, 255, 255), 2)
+                        cv2.drawContours(img, [box], 0, (255, 255, 255), 2)
 
-                        if (markerspace[0][0] > area[0][0] and markerspace[1][0] > area[1][0]) and \
-                                (markerspace[2][0] < area[2][0] and markerspace[3][0] < area[3][0]):
-                            cv2.drawContours(img, [markerspace], 0, (0, 0, 255), 2)
-                            MarkerInArea = True
-                        else:
-                            cv2.drawContours(img, [markerspace], 0, (0, 0, 0), 2)
-                            MarkerInArea = False
-                    else:
-                        cv2.drawContours(img, [box], 0, (0, 255, 0), 2)
+                        # Found and printed marker contours above. No check for circles in it.
+                        circleContour = contours[currentHierarchy[2]]
+                        circleHierarchy = hierarchy[currentHierarchy[2]]
+                        marker = 0
+                        breakNext = False
+
+                        if circleHierarchy[0] == -1:
+                            breakNext = True
+                            print("breakNext True")
+
+
+                        print("Hier ben ik")
+                        while True:
+                            print(circleHierarchy)
+                            rect3 = cv2.minAreaRect(circleContour)
+                            box3 = cv2.boxPoints(rect3)
+                            box3 = np.int0(box3)
+                            cv2.drawContours(img, [box3], 0, (255, 0, 0), 2)
+                            marker += 1
+                            circleHierarchy = hierarchy[circleHierarchy[0]]
+                            circleContour = contours[circleHierarchy[0]]
+
+                            if breakNext:
+                                print("gebroken")
+                                break
+
+                            if circleHierarchy[0] == -1:
+                                breakNext = True
+                                print("breakNext True")
+
+
+                    # if currentHierarchy[3] == -1:
+                    #     # print(box)
+                    #     markerspace = box
+                    #     # print(markerspace[0])
+                    #
+                    #     if (markerspace[0][0] > area[0][0] and markerspace[1][0] > area[1][0]) and \
+                    #             (markerspace[2][0] < area[2][0] and markerspace[3][0] < area[3][0]):
+                    #         # cv2.drawContours(img, [markerspace], 0, (0, 0, 255), 2)
+                    #         MarkerInArea = True
+                    #     else:
+                    #         # cv2.drawContours(img, [markerspace], 0, (0, 0, 0), 2)
+                    #         MarkerInArea = False
+                    # else:
+                    #     # cv2.drawContours(img, [box], 0, (0, 255, 0), 2)
+                    #     pass
 
         if not MarkerInArea:
-            moments = cv2.moments(markerspace)
+            moments = cv2.moments(MarkerContourOutside)
 
             cx = int(moments['m10'] / moments['m00'])
             cy = int(moments['m01'] / moments['m00'])
@@ -139,7 +181,6 @@ while True:
             dx = cx - 320
             dy = cy - 180
             distanceToCenter = np.sqrt(dx * dx + dy * dy)
-            print("Dist: ", distanceToCenter)
             cv2.line(img, (cx, cy), (320, 180), (255, 255, 255))
 
             if distanceToCenter > 0:
@@ -150,7 +191,7 @@ while True:
                 cv2.putText(img, "Move: Left", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 0))
 
             cnt += 1
-        cv2.putText(img, str(marker), (10, 50), cv2.FONT_HERSHEY_PLAIN, 3, (0, 0, 0))
+        cv2.putText(img, str(marker), (10, 50), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 255))
         print("marker = ", marker)
 
         # for component in zip(contours, hierarchy):
@@ -167,8 +208,9 @@ while True:
 
         cv2.imshow("Image", img)
         cv2.waitKey(1)
-        # time.sleep(5)
+        # time.sleep(3)
         i = 32
+        # i += 1
         if i > 35:
             i = 0
             # print(hierarchy)
