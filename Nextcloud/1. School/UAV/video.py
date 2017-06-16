@@ -86,7 +86,7 @@ lower_mask = np.array([0, 4, 148])
 upper_mask = np.array([255, 255, 255])
 i = 1
 ret = True
-nextMarker = 1
+nextMarker = 2
 
 while True:
     img = cv2.imread("drone/img" + str(i) + ".jpg")
@@ -112,7 +112,7 @@ while True:
             currentMarker = 0
             MarkerInArea = True
             area = np.array([[180, 0], [180, 360], [540, 360], [540, 0]])
-            cv2.drawContours(img, [area], 0, (255, 0, 0), 2)
+            # cv2.drawContours(img, [area], 0, (255, 0, 0), 2)
 
             for component in zip(contours, hierarchy):
                 currentContour = component[0]
@@ -136,8 +136,6 @@ while True:
                             rect2 = cv2.minAreaRect(MarkerContourOutside)
                             box2 = cv2.boxPoints(rect2)
                             box2 = np.int0(box2)
-                            cv2.drawContours(img, [box2], 0, (0, 255, 255), 2)
-                            cv2.drawContours(img, [box], 0, (255, 255, 255), 2)
 
                             # Found and printed marker contours above. Now check for circles in it.
                             circleContour = contours[currentHierarchy[2]]
@@ -174,9 +172,9 @@ while True:
                                 dx = cx - 320
                                 dy = cy - 180
                                 distanceToCenter = np.sqrt(dx * dx + dy * dy)
-                                cv2.line(img, (cx, cy), (320, 180), (255, 255, 255))
+                                cv2.line(img, (cx, cy), (320, 180), (0, 255, 0), thickness=4)
                                 print("D: ", distanceToCenter)
-                                if distanceToCenter < 2:    # If close to center, we are above te image!
+                                if distanceToCenter < 40:    # If close to center, we are above te image!
                                     nextMarker = currentMarker + 1
                                     if nextMarker == 4:
                                         nextMarker = 1
@@ -191,13 +189,22 @@ while True:
 
                                 if dy > 0:
                                     # move right
-                                    cv2.putText(img, "Move: Down", (10, 100), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
+                                    cv2.putText(img, "Move: back", (10, 100), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
                                 else:
                                     # move left
-                                    cv2.putText(img, "Move: Up", (10, 100), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
+                                    cv2.putText(img, "Move: forward", (10, 100), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
 
-        cv2.putText(img, str(currentMarker), (10, 50), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 255))
-        print("marker = ", currentMarker)
+                                # Print more!
+
+                                cv2.putText(img, str(currentMarker), (10, 50), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 255))
+                                print("marker = ", currentMarker)
+
+                                cv2.drawContours(img, [box2], 0, (0, 255, 255), 2)
+                                cv2.drawContours(img, [box], 0, (255, 255, 255), 2)
+                            else:
+                                cv2.drawContours(img, [box2], 0, (0, 0, 0), 2)
+                                cv2.drawContours(img, [box], 0, (0, 0, 0), 2)
+
 
         # for component in zip(contours, hierarchy):
         #     currentContour = component[0]
