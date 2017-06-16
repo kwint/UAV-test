@@ -8,11 +8,11 @@ def nothing(x):
 
 
 def init():
-    drone = ARDrone()
-    drone.send(at.CONFIG('general:navdata_demo', True))
-    time.sleep(0.1)
-    drone.send(at.CONFIG("video:video_channel", 1))
-    time.sleep(0.1)
+    # drone = ARDrone()
+    # drone.send(at.CONFIG('general:navdata_demo', True))
+    # time.sleep(0.1)
+    # drone.send(at.CONFIG("video:video_channel", 1))
+    # time.sleep(0.1)
 
     # Create windows and sliders
     cv2.namedWindow("Image", cv2.WINDOW_AUTOSIZE)
@@ -79,16 +79,18 @@ def filter_image(img, lower_mask, upper_mask):
     # Return binary image and slider data, so program remebers their position
     return thres, b, g, r, b1, g1, r1
 print(" 1")
-cam = cv2.VideoCapture('tcp://192.168.1.1:5555')
+# cam = cv2.VideoCapture('tcp://192.168.1.1:5555')
 print(" 2")
 init()
 lower_mask = np.array([0, 4, 148])
 upper_mask = np.array([255, 255, 255])
 i = 1
 ret = True
+nextMarker = 1
+
 while True:
-    # img = cv2.imread("drone/img" + str(i) + ".jpg")
-    ret, img = cam.read()
+    img = cv2.imread("drone/img" + str(i) + ".jpg")
+    # ret, img = cam.read()
     print(ret)
     if ret:
 
@@ -102,7 +104,12 @@ while True:
             hierarchy = hierarchy[0]
             print("hierarchy: ", hierarchy)
 
-            marker = 0
+        except TypeError:
+            # When contrours doesnt find anything
+            print(" Ja Dat was me weer een errotje zeg")
+
+        else:
+            currentMarker = 0
             MarkerInArea = True
             area = np.array([[180, 0], [180, 360], [540, 360], [540, 0]])
             cv2.drawContours(img, [area], 0, (255, 0, 0), 2)
@@ -132,75 +139,83 @@ while True:
                             cv2.drawContours(img, [box2], 0, (0, 255, 255), 2)
                             cv2.drawContours(img, [box], 0, (255, 255, 255), 2)
 
-                            # Found and printed marker contours above. No check for circles in it.
+                            # Found and printed marker contours above. Now check for circles in it.
                             circleContour = contours[currentHierarchy[2]]
                             circleHierarchy = hierarchy[currentHierarchy[2]]
-                            marker = 0
+                            currentMarker = 0
                             breakNext = False
 
                             if circleHierarchy[0] == -1:
                                 breakNext = True
-                                print("breakNext True")
 
-                            print("Hier ben ik")
                             while True:
                                 print(circleHierarchy)
                                 rect3 = cv2.minAreaRect(circleContour)
                                 box3 = cv2.boxPoints(rect3)
                                 box3 = np.int0(box3)
                                 cv2.drawContours(img, [box3], 0, (255, 0, 0), 2)
-                                marker += 1
+                                currentMarker += 1
                                 circleHierarchy = hierarchy[circleHierarchy[0]]
                                 circleContour = contours[circleHierarchy[0]]
 
                                 if breakNext:
-                                    print("gebroken")
                                     break
 
                                 if circleHierarchy[0] == -1:
                                     breakNext = True
-                                    print("breakNext True")
+                            # If the marker found is the marker we're looking for. Calculate its distance to the center
+                            # of the image
+                            if currentMarker == nextMarker:
+                                moments = cv2.moments(MarkerContourOutside)
+
+                                cx = int(moments['m10'] / moments['m00'])
+                                cy = int(moments['m01'] / moments['m00'])
+
+                                dx = cx - 320
+                                dy = cy - 180
+                                distanceToCenter = np.sqrt(dx * dx + dy * dy)
+                                cv2.line(img, (cx, cy), (320, 180), (255, 255, 255))
+                                print("D: ", distanceToCenter)
+                                if distanceToCenter < 2:    # If close to center, we are above te image!
+                                    nextMarker = currentMarker + 1
+                                    if nextMarker == 4:
+                                        nextMarker = 1
+                                    print("JAAAA IK BEN OP EEN MARKER, LETS MAKE A PICTURE MATES")
+
+                                if dx > 0:
+                                    # move right
+                                    cv2.putText(img, "Move: Right", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
+                                else:
+                                    # move left
+                                    cv2.putText(img, "Move: Left", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
+
+                                if dy > 0:
+                                    # move right
+                                    cv2.putText(img, "Move: Down", (10, 100), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
+                                else:
+                                    # move left
+                                    cv2.putText(img, "Move: Up", (10, 100), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
+
+        cv2.putText(img, str(currentMarker), (10, 50), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 255))
+        print("marker = ", currentMarker)
+
+        # for component in zip(contours, hierarchy):
+        #     currentContour = component[0]
+        #     currentHierarchy = component[1]
+        #     x, y, w, h = cv2.boundingRect(currentContour)
+        #     print(currentHierarchy[2])
+        #     if currentHierarchy[2] < 0:
+        #         # these are the innermost child components
+        #         cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
+        #     elif currentHierarchy[3] < 0:
+        #         # these are the outermost parent components
+        #         cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
 
-                            moments = cv2.moments(MarkerContourOutside)
-
-                            cx = int(moments['m10'] / moments['m00'])
-                            cy = int(moments['m01'] / moments['m00'])
-
-                            dx = cx - 320
-                            dy = cy - 180
-                            distanceToCenter = np.sqrt(dx * dx + dy * dy)
-                            cv2.line(img, (cx, cy), (320, 180), (255, 255, 255))
-
-                            # if distanceToCenter > 0:
-                            #     # move right
-                            #     cv2.putText(img, "Move: Right", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
-                            # if distanceToCenter < 0:
-                            #     # move left
-                            #     cv2.putText(img, "Move: Left", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
-
-            cv2.putText(img, str(marker), (10, 50), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 255))
-            print("marker = ", marker)
-
-            # for component in zip(contours, hierarchy):
-            #     currentContour = component[0]
-            #     currentHierarchy = component[1]
-            #     x, y, w, h = cv2.boundingRect(currentContour)
-            #     print(currentHierarchy[2])
-            #     if currentHierarchy[2] < 0:
-            #         # these are the innermost child components
-            #         cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
-            #     elif currentHierarchy[3] < 0:
-            #         # these are the outermost parent components
-            #         cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-        except TypeError:
-            print(" Ja Dat was me weer een errotje zeg")
         cv2.imshow("Image", img)
         cv2.waitKey(1)
         # time.sleep(3)
-        i = 32
+        i = 23
         # i += 1
         if i > 35:
             i = 0
-            # print(hierarchy)
