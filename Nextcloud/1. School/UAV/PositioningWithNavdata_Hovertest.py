@@ -18,7 +18,8 @@ def init():
         time.sleep(1)
 
     if uav.state.vbat_low:
-        print("Battery to low")
+        print("Battery to low, please replace before flying")
+        exit()
     elif uav.state.video_mask == 0:
         print("Video Disabled")
     elif uav.state.vision_mask == 0:
@@ -52,7 +53,7 @@ def init():
     elif uav.state.cutout_mask:
         print("Cutout system detected")
     else:
-        print("Ready")
+        print("Self-test: All Clear")
     return uav
 
 drone = init()
