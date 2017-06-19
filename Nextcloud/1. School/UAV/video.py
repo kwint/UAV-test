@@ -26,8 +26,7 @@ def init():
         print("Battery to low, please replace before flying")
         exit()
     elif uav.state.video_mask == 0:
-        print("Video Disabled, please fix this problem before flying")
-        exit()
+        print("Video Disabled")
     elif uav.state.vision_mask == 0:
         print("Vision Disabled")
     elif uav.state.altitude_mask == 0:
@@ -140,7 +139,7 @@ def takeoff(drone):
         drone.takeoff()
 
     print("Hovering")
-    timeout = time.time() + 5
+    timeout = time.time() + 10
     while True:
         drone.hover()
         if time.time() > timeout:
@@ -149,12 +148,12 @@ def takeoff(drone):
     print("Going up")
     altitude = drone.navdata.demo.altitude
     while altitude < 1800:
-        drone.move(up=0.5)
+        drone.move(up=0.2)
         altitude = drone.navdata.demo.altitude
     drone.move(up=0)
 
     print("Hovering")
-    timeout = time.time() + 3
+    timeout = time.time() + 5
     while True:
         drone.hover()
 
@@ -295,7 +294,10 @@ while True:
                                     lookForNextMarker = True
                                     if nextMarker == maxMarkers:
                                         nextMarker = 1
-                                        drone.land()
+                                        print("Landing")
+                                        while drone.state.fly_mask:
+                                            drone.land()
+                                        exit()
 
                                 if dx > 0:
                                     # move right
