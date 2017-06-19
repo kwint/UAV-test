@@ -203,7 +203,7 @@ while True:
     ret, img = cam.read()  # Get picture from video feed
     if ret:  # If picture gotten
 
-        # For setting color filtering settings, usefull for different backgrounds
+        # For setting color filtering settings, useful for different backgrounds
         thres, b, g, r, b1, g1, r1 = filter_image(img, lower_mask, upper_mask)
         lower_mask = [b, g, r]
         upper_mask = [b1, g1, r1]
@@ -338,11 +338,10 @@ while True:
             movethread = threading.Thread(target=move.droneMove, args=(moveData, drone))
             movethread.start()
             moveData.marker = False
+
         if not movethread.is_alive() and not moveData.marker:
-            drone.move(left=speed)
-            time.sleep(0.1)
-            drone.hover()
-            time.sleep(0.3)
+            movethread = threading.Thread(target=move.droneMove, args=(moveData, drone))
+            movethread.start()
         # time.sleep(3)
         i = 23
         # i += 1
