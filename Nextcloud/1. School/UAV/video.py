@@ -298,7 +298,7 @@ while True:
                                 if distanceToCenter < 40:  # If close to center, we are above the marker!
                                     nextMarker = currentMarker + 1
                                     print("JAAAA IK BEN OP EEN MARKER, LETS MAKE A PICTURE MATES")
-                                    move.takePicture(drone, currentMarker, height, cam)
+                                    move.takePicture(drone, currentMarker, 1, cam)
                                     lookForNextMarker = True
                                     if nextMarker == maxMarkers:
                                         nextMarker = 1
