@@ -2,11 +2,13 @@ from pyardrone import at
 import cv2
 import time
 
-def takePicture(drone, marker, hight):
+def takePicture(drone, marker, hight, cam):
 
     drone.send(at.CONFIG("video:video_channel", 0))
 
     time.sleep(3)
+
+    cam.read()
     cv2.imwrite("result/"+ str(time.ctime()) + str(marker) + str(hight))
     print("saved image")
     time.sleep(0.1)
