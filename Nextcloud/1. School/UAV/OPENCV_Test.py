@@ -40,7 +40,7 @@ for i in range(1,2000):
 
    cv2.imshow("DroneView", frame)
 
-   k = cv2.waitKey(1)
+   k = cv2.waitKey(1000)
    if k & 0xFF == ord('q'):
       break
    if (k == ord('a')):

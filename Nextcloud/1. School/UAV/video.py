@@ -25,45 +25,48 @@ def init():
     if uav.state.vbat_low:
         print("Battery to low, please replace before flying")
         exit()
-    elif uav.state.video_mask == 0:
+    if uav.state.video_mask == 0:
+        print("Video_mask Disabled")
+    if drone.state.video == 0:
         print("Video Disabled")
-    elif uav.state.vision_mask == 0:
+    if uav.state.vision_mask == 0:
         print("Vision Disabled")
-    elif uav.state.altitude_mask == 0:
+    if uav.state.altitude_mask == 0:
         print("Altitude control inactive")
-    elif uav.state.camera_mask == 0:
+    if uav.state.camera_mask == 0:
         print("Camera not ready")
-    elif uav.state.travelling_mask == 0:
+    if uav.state.travelling_mask == 0:
         print("Travelling mask disabled")
-    elif uav.state.usb_mask == 0:
+    if uav.state.usb_mask == 0:
         print("USB key not ready")
-    elif uav.state.navdata_demo_mask == 0:
+    if uav.state.navdata_demo_mask == 0:
         print("navdata demo not activated")
-    elif uav.state.navdata_bootstrap:
+    if uav.state.navdata_bootstrap:
         print("no navdata options send")
-    elif uav.state.motors_mask:
+    if uav.state.motors_mask:
         print("Motors problem")
-    elif uav.state.com_lost_mask:
+    if uav.state.com_lost_mask:
         print("Communication problem")
-    elif uav.state.software_fault:
+    if uav.state.software_fault:
         print("Software fault detected")
-    elif uav.state.magneto_needs_calib:
+    if uav.state.magneto_needs_calib:
         print("Magneto calibration needed")
-    elif uav.state.angles_out_of_range:
+    if uav.state.angles_out_of_range:
         print("angles_out_of_range")
-    elif uav.state.wind_mask:
+    if uav.state.wind_mask:
         print("Too much wind")
-    elif uav.state.ultrasound_mask:
+    if uav.state.ultrasound_mask:
         print("Ultrasonic sensor deaf")
-    elif uav.state.cutout_mask:
+    if uav.state.cutout_mask:
         print("Cutout system detected")
-    else:
-        print("Self-test: All Clear")
 
     while uav.state.emergency_mask:
-        print("Emergency")
-        uav.send(at.REF(0b0100000000))
-        time.sleep(1)
+        print("Emergency, press y to undo or press n to exit")
+        k = cv2.waitKey(2000) & 0xFF
+        if k == ord('n'):
+            exit()
+        elif k == ord('y'):
+            uav.send(at.REF(0b0100000000))
 
     # Create windows and sliders
     cv2.namedWindow("Image", cv2.WINDOW_AUTOSIZE)
