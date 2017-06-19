@@ -2,6 +2,7 @@ import cv2
 import time
 import numpy as np
 from pyardrone import ARDrone, at
+import threading
 
 import move
 
@@ -83,7 +84,17 @@ def filter_image(img, lower_mask, upper_mask):
     # Return binary image and slider data, so program remebers their position
     return thres, b, g, r, b1, g1, r1
 
+def droneMove(moveData, drone):
+    # TODO insert jeroens dingetje
+    pass
 
+class MoveData:
+    def __init__(self, marker, dirx, speedx, diry, speedy):
+        self.speedy = speedy
+        self.diry = diry
+        self.speedx = speedx
+        self.dirx = dirx
+        self.marker = marker
 
 print(" 1")
 # cam = cv2.VideoCapture('tcp://192.168.1.1:5555')
@@ -97,6 +108,9 @@ nextMarker = 2
 speed = 0.2
 
 lookForNextMarker = False
+MarkerFound = False
+moveData = MoveData(False, 0, speed, 0, speed)
+movethread = threading.Thread(target=droneMove, args=(moveData, drone))
 
 time.sleep(2)
 drone.takeoff()
@@ -179,6 +193,7 @@ while True:
                             # of the image
                             if currentMarker == nextMarker:
                                 lookForNextMarker = False
+                                moveData.marker = True
                                 moments = cv2.moments(MarkerContourOutside)
 
                                 cx = int(moments['m10'] / moments['m00'])
@@ -201,20 +216,21 @@ while True:
                                 if dx > 0:
                                     # move right
                                     cv2.putText(img, "Move: Right", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
-                                    drone.move(right=speed)
+                                    moveData.dirx = 1
+
                                 else:
                                     # move left
                                     cv2.putText(img, "Move: Left", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
-                                    drone.move(left=speed)
-
+                                    moveData.dirx = -1
                                 if dy > 0:
                                     # move back
                                     cv2.putText(img, "Move: back", (10, 100), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
-                                    drone.move(backward=speed)
+                                    moveData.diry = -1
                                 else:
                                     # move left
                                     cv2.putText(img, "Move: forward", (10, 100), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
-                                    drone.move(forward=speed)
+                                    moveData.diry = 1
+
                                 # Print more!
 
                                 cv2.putText(img, str(currentMarker), (10, 50), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 255))
@@ -229,22 +245,17 @@ while True:
                             if currentMarker != nextMarker and lookForNextMarker:
                                 drone.move(left=speed)
 
-
-        # for component in zip(contours, hierarchy):
-        #     currentContour = component[0]
-        #     currentHierarchy = component[1]
-        #     x, y, w, h = cv2.boundingRect(currentContour)
-        #     print(currentHierarchy[2])
-        #     if currentHierarchy[2] < 0:
-        #         # these are the innermost child components
-        #         cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
-        #     elif currentHierarchy[3] < 0:
-        #         # these are the outermost parent components
-        #         cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-
         cv2.imshow("Image", img)
         cv2.waitKey(1)
+
+        if not movethread.is_alive() and moveData.marker:
+            movethread = threading.Thread(target=droneMove, args=(moveData, drone))
+            movethread.start()
+            moveData.marker = False
+        if not movethread.is_alive() and not moveData.marker:
+            drone.move(left=speed)
+            time.sleep(0.4)
+            drone.hover()
         # time.sleep(3)
         i = 23
         # i += 1
