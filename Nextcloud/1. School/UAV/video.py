@@ -61,7 +61,7 @@ def init():
     while uav.state.emergency_mask:
         print("Emergency")
         uav.send(at.REF(0b0100000000))
-        time.sleep(0.1)
+        time.sleep(1)
 
     # Create windows and sliders
     cv2.namedWindow("Image", cv2.WINDOW_AUTOSIZE)
@@ -132,7 +132,7 @@ def filter_image(img, lower_mask, upper_mask):
     thres = cv2.morphologyEx(thres, cv2.MORPH_CLOSE, kernel)
 
     # Return binary image and slider data, so program remebers their position
-    return thres, b, g, r, b1, g1, r1
+    return thres
 
 
 def takeoff(drone):
@@ -186,7 +186,7 @@ ret = True
 nextMarker = 1  # first marker
 maxMarkers = 4  # number of markers +1
 firstMarker = True
-speed = 0.1  # speed of drone
+speed = 0.0  # speed of drone
 
 lookForNextMarker = False
 MarkerFound = False
@@ -195,7 +195,7 @@ MarkerFound = False
 moveData = MoveData(False, 0, speed, 0, speed)
 movethread = threading.Thread(target=move.droneMove, args=(moveData, drone))
 
-takeoff(drone)
+# takeoff(drone)
 
 while True:
     # img = cv2.imread("drone/img" + str(i) + ".jpg") # for testing with images
@@ -204,15 +204,16 @@ while True:
     if ret:  # If picture gotten
 
         # For setting color filtering settings, useful for different backgrounds
-        thres, b, g, r, b1, g1, r1 = filter_image(img, lower_mask, upper_mask)
-        lower_mask = [b, g, r]
-        upper_mask = [b1, g1, r1]
+        # thres, b, g, r, b1, g1, r1 = filter_image(img, lower_mask, upper_mask)
+        # lower_mask = [b, g, r]
+        # upper_mask = [b1, g1, r1]
+        thres = filter_image(img, lower_mask, upper_mask)
         # cv2.imshow("thres", thres)
         try:
             im2, contours, hierarchy = cv2.findContours(thres, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
             hierarchy = hierarchy[0]
-            print("hierarchy: ", hierarchy)
+            # print("hierarchy: ", hierarchy)
 
         except TypeError:
             # When contrours doesnt find anything
@@ -294,7 +295,28 @@ while True:
                                 if distanceToCenter < 40:  # If close to center, we are above the marker!
                                     nextMarker = currentMarker + 1
                                     print("JAAAA IK BEN OP EEN MARKER, LETS MAKE A PICTURE MATES")
-                                    move.takePicture(drone, currentMarker, 1, cam)
+                                    # move.takePicture(drone, currentMarker, 1, cam)
+                                    timeout = time.time() + 10
+                                    while time.time() < timeout:
+                                        drone.send(at.CONFIG("video:video_channel", 0))
+                                        drone.hover()
+
+                                    ret, muur = cam.read()
+
+                                    if ret:
+                                        string = str(time.ctime()) + " " + str(currentMarker) + " 1" + ".jpg"
+                                        print(string)
+                                        cv2.imwrite('C:\\' + string, muur)
+                                        cv2.imwrite("img" + str(currentMarker) + ".jpg", muur)
+                                        cv2.imshow(string, muur)
+                                        cv2.waitKey(1)
+                                        print("saved image")
+                                    time.sleep(0.1)
+
+                                    drone.send(at.CONFIG("video:video_channel", 1))
+                                    timeout = time.time() + 3
+                                    while time.time() < timeout:
+                                        drone.hover()
                                     lookForNextMarker = True
                                     if nextMarker == maxMarkers:
                                         nextMarker = 1

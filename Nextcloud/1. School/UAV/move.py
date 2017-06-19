@@ -4,21 +4,25 @@ import time
 
 def takePicture(drone, marker, hight, cam):
 
-    drone.send(at.CONFIG("video:video_channel", 0))
-
-    time.sleep(3)
+    timeout = time.time() + 10
+    while time.time() < timeout:
+        drone.send(at.CONFIG("video:video_channel", 0))
+        drone.hover()
 
     ret, img = cam.read()
 
     if ret:
         string = str(time.ctime()) + str(marker) + str(hight) + ".jpg"
-        cv2.imwrite(string, img)
+        print(string)
+        cv2.imwrite('C:\\' + string, img)
         cv2.imshow(string, img)
         print("saved image")
     time.sleep(0.1)
 
     drone.send(at.CONFIG("video:video_channel", 1))
-    time.sleep(2)
+    timeout = time.time() + 3
+    while time.time() < timeout:
+        drone.hover()
     return
 
 

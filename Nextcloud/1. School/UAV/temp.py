@@ -9,7 +9,7 @@ cam = cv2.VideoCapture('tcp://192.168.1.1:5555')
 drone = ARDrone()
 drone.send(at.CONFIG('general:navdata_demo', True))
 time.sleep(0.1)
-drone.send(at.CONFIG("video:video_channel", 2))
+drone.send(at.CONFIG("video:video_channel", 0))
 time.sleep(0.1)
 print("at done")
 
