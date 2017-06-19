@@ -26,7 +26,8 @@ def init():
         print("Battery to low, please replace before flying")
         exit()
     elif uav.state.video_mask == 0:
-        print("Video Disabled")
+        print("Video Disabled, please fix this problem before flying")
+        exit()
     elif uav.state.vision_mask == 0:
         print("Vision Disabled")
     elif uav.state.altitude_mask == 0:
@@ -161,7 +162,6 @@ def takeoff(drone):
             break
 
 
-
 class MoveData:
     def __init__(self, marker, dir_x, speed_x, dir_y, speed_y):
         self.speed_y = speed_y
@@ -171,9 +171,9 @@ class MoveData:
         self.marker = marker
 
 
-print(" 1")
+print("\tStarting Program")
 cam = cv2.VideoCapture('tcp://192.168.1.1:5555')
-print(" 2")
+print("\tVideoCapture ready")
 drone = init()
 
 # Data for debuging
