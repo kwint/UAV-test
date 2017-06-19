@@ -26,8 +26,6 @@ def init():
         print("Battery to low, please replace before flying")
         exit()
     if uav.state.video_mask == 0:
-        print("Video_mask Disabled")
-    if drone.state.video == 0:
         print("Video Disabled")
     if uav.state.vision_mask == 0:
         print("Vision Disabled")
@@ -61,12 +59,9 @@ def init():
         print("Cutout system detected")
 
     while uav.state.emergency_mask:
-        print("Emergency, press y to undo or press n to exit")
-        k = cv2.waitKey(2000) & 0xFF
-        if k == ord('n'):
-            exit()
-        elif k == ord('y'):
-            uav.send(at.REF(0b0100000000))
+        print("Emergency")
+        uav.send(at.REF(0b0100000000))
+        time.sleep(0.1)
 
     # Create windows and sliders
     cv2.namedWindow("Image", cv2.WINDOW_AUTOSIZE)
@@ -142,7 +137,7 @@ def takeoff(drone):
         drone.takeoff()
 
     print("Hovering")
-    timeout = time.time() + 10
+    timeout = time.time() + 6
     while True:
         drone.hover()
         if time.time() > timeout:
@@ -156,7 +151,7 @@ def takeoff(drone):
     drone.move(up=0)
 
     print("Hovering")
-    timeout = time.time() + 5
+    timeout = time.time() + 3
     while True:
         drone.hover()
 

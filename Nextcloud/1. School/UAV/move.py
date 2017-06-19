@@ -11,7 +11,7 @@ def takePicture(drone, marker, hight, cam):
     ret, img = cam.read()
 
     if ret:
-        cv2.imwrite("result/"+ str(time.ctime()) + str(marker) + str(hight) + ".jpg", img)
+        cv2.imwrite(str(time.ctime()) + str(marker) + str(hight) + ".jpg", img)
         print("saved image")
     time.sleep(0.1)
 
@@ -21,7 +21,6 @@ def takePicture(drone, marker, hight, cam):
 
 
 def droneMove(moveData, drone):
-    print("Hovering")
     timeout = time.time() + 0.5
     while True:
         if moveData.marker:
