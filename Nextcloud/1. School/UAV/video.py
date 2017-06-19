@@ -133,17 +133,33 @@ def filter_image(img, lower_mask, upper_mask):
     return thres, b, g, r, b1, g1, r1
 
 
-def droneMove(moveData, drone):
-    if moveData.dir_x:
-        drone.move(forward=moveData.speed_x)
-    else:
-        drone.move(backward=moveData.speed_x)
+def takeoff(drone):
+    print("Take-off..")
+    while not drone.state.fly_mask:
+        drone.takeoff()
 
-    if moveData.dir_y:
-        drone.move(right=moveData.speed_y)
-    else:
-        drone.move(left=moveData.speed_y)
-    pass
+    print("Hovering")
+    timeout = time.time() + 5
+    while True:
+        drone.hover()
+        if time.time() > timeout:
+            break
+
+    print("Going up")
+    altitude = drone.navdata.demo.altitude
+    while altitude < 1800:
+        drone.move(up=0.5)
+        altitude = drone.navdata.demo.altitude
+    drone.move(up=0)
+
+    print("Hovering")
+    timeout = time.time() + 3
+    while True:
+        drone.hover()
+
+        if time.time() > timeout:
+            break
+
 
 class MoveData:
     def __init__(self, marker, dir_x, speed_x, dir_y, speed_y):
@@ -174,33 +190,9 @@ MarkerFound = False
 
 # Create things for thread that moves the drone
 moveData = MoveData(False, 0, speed, 0, speed)
-movethread = threading.Thread(target=droneMove, args=(moveData, drone))
+movethread = threading.Thread(target=move.droneMove, args=(moveData, drone))
 
-print("Take-off..")
-while not drone.state.fly_mask:
-    drone.takeoff()
-
-print("Hovering")
-timeout = time.time() + 5
-while True:
-    drone.hover()
-    if time.time() > timeout:
-        break
-
-print("Going up")
-altitude = drone.navdata.demo.altitude
-while altitude < 1800:
-    drone.move(up=0.5)
-    altitude = drone.navdata.demo.altitude
-drone.move(up=0)
-
-print("Hovering")
-timeout = time.time() + 3
-while True:
-    drone.hover()
-
-    if time.time() > timeout:
-        break
+takeoff(drone)
 
 while True:
     # img = cv2.imread("drone/img" + str(i) + ".jpg") # for testing with images
@@ -337,7 +329,7 @@ while True:
         cv2.waitKey(1)
 
         if not movethread.is_alive() and moveData.marker:
-            movethread = threading.Thread(target=droneMove, args=(moveData, drone))
+            movethread = threading.Thread(target=move.droneMove, args=(moveData, drone))
             movethread.start()
             moveData.marker = False
         if not movethread.is_alive() and not moveData.marker:

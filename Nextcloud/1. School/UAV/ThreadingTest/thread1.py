@@ -1,15 +1,7 @@
 # Read data
-import numpy as np
+import time
 
-global flag
-global move
-
-def process():
-
-    flag = 1
-    move = 0
-    while True:
-        if flag == 1:
-            move += 10
-            print("edit move")
-            flag = 2
+def produce(gegeven):
+    for i in range(0, 10):
+        print(gegeven.dirx)
+        time.sleep(0.2)
