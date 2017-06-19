@@ -32,7 +32,7 @@ def droneMove(moveData, drone):
 
             if moveData.dir_y == 1:
                 drone.move(right=moveData.speed_y)
-            elif moveData.dir_y == 0
+            elif moveData.dir_y == 0:
                 drone.move(left=moveData.speed_y)
             if time.time() > timeout:
                 break
@@ -40,6 +40,7 @@ def droneMove(moveData, drone):
         timeout = time.time() + 1
         while True:
             drone.move(forward=0, left=0, right=0, backward=0)
+            drone.hover()
             if time.time() > timeout:
                 break
     else:
@@ -49,5 +50,11 @@ def droneMove(moveData, drone):
                 if time.time() > timeout:
                     break
 
-    time.sleep(2)
+        timeout = time.time() + 1
+        while True:
+            drone.move(forward=0, left=0, right=0, backward=0)
+            drone.hover()
+            if time.time() > timeout:
+                break
+
     pass
