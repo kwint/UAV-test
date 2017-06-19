@@ -24,10 +24,12 @@ def droneMove(moveData, drone):
     print("Hovering")
     timeout = time.time() + 0.5
     while True:
-        if moveData.dir_x:
-            drone.move(forward=moveData.speed_x)
-        else:
-            drone.move(backward=moveData.speed_x)
+        if moveData.marker:
+
+            if moveData.dir_x == 1:
+                drone.move(forward=moveData.speed_x)
+            elif moveData.dir_y == 0:
+                drone.move(backward=moveData.speed_x)
 
             if moveData.dir_y == 1:
                 drone.move(right=moveData.speed_y)
@@ -36,24 +38,24 @@ def droneMove(moveData, drone):
             if time.time() > timeout:
                 break
 
-        timeout = time.time() + 1
-        while True:
-            drone.move(forward=0, left=0, right=0, backward=0)
-            drone.hover()
-            if time.time() > timeout:
-                break
-    else:
-        timeout = time.time() + 0.5
-        while True:
+            timeout = time.time() + 1
+            while True:
+                drone.move(forward=0, left=0, right=0, backward=0)
+                drone.hover()
+                if time.time() > timeout:
+                    break
+        else:
+            timeout = time.time() + 0.5
+            while True:
                 drone.move(left=moveData.speed_y)
                 if time.time() > timeout:
                     break
 
-        timeout = time.time() + 1
-        while True:
-            drone.move(forward=0, left=0, right=0, backward=0)
-            drone.hover()
-            if time.time() > timeout:
-                break
+            timeout = time.time() + 1
+            while True:
+                drone.move(forward=0, left=0, right=0, backward=0)
+                drone.hover()
+                if time.time() > timeout:
+                    break
 
     pass
