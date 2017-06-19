@@ -307,20 +307,20 @@ while True:
                                 if dx > 0:
                                     # move right
                                     cv2.putText(img, "Move: Right", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
-                                    moveData.dir_x = 1
+                                    moveData.dir_y = 0
 
                                 else:
                                     # move left
                                     cv2.putText(img, "Move: Left", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
-                                    moveData.dir_x = -1
+                                    moveData.dir_y = 1
                                 if dy > 0:
                                     # move back
                                     cv2.putText(img, "Move: back", (10, 100), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
-                                    moveData.dir_y = -1
+                                    moveData.dir_x = 0
                                 else:
                                     # move left
                                     cv2.putText(img, "Move: forward", (10, 100), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
-                                    moveData.dir_y = 1
+                                    moveData.dir_x = 1
 
                                 # Print more!
 
