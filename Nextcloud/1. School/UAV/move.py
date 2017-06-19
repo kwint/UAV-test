@@ -11,7 +11,9 @@ def takePicture(drone, marker, hight, cam):
     ret, img = cam.read()
 
     if ret:
-        cv2.imwrite("result/"+ str(time.ctime()) + str(marker) + str(hight) + ".jpg", img)
+        string = str(time.ctime()) + str(marker) + str(hight) + ".jpg"
+        cv2.imwrite(string, img)
+        cv2.imshow(string, img)
         print("saved image")
     time.sleep(0.1)
 

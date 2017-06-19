@@ -71,50 +71,54 @@ def init():
     # Create windows and sliders
     cv2.namedWindow("Image", cv2.WINDOW_AUTOSIZE)
 
-    cv2.namedWindow('slider', cv2.WINDOW_AUTOSIZE)
-    cv2.moveWindow('slider', 640, 0)
-    cv2.resizeWindow('slider', 560, 400)
-    cv2.createTrackbar('B', 'slider', 0, 255, nothing)
-    cv2.createTrackbar('G', 'slider', 0, 255, nothing)
-    cv2.createTrackbar('R', 'slider', 0, 255, nothing)
-
-    cv2.createTrackbar('B1', 'slider', 0, 255, nothing)
-    cv2.createTrackbar('G1', 'slider', 0, 255, nothing)
-    cv2.createTrackbar('R1', 'slider', 0, 255, nothing)
-
-    cv2.createTrackbar('kernel', 'slider', 1, 20, nothing)
-    cv2.setTrackbarPos('kernel', 'slider', 2)
+    # cv2.namedWindow('slider', cv2.WINDOW_AUTOSIZE)
+    # cv2.moveWindow('slider', 640, 0)
+    # cv2.resizeWindow('slider', 560, 400)
+    # cv2.createTrackbar('B', 'slider', 0, 255, nothing)
+    # cv2.createTrackbar('G', 'slider', 0, 255, nothing)
+    # cv2.createTrackbar('R', 'slider', 0, 255, nothing)
+    #
+    # cv2.createTrackbar('B1', 'slider', 0, 255, nothing)
+    # cv2.createTrackbar('G1', 'slider', 0, 255, nothing)
+    # cv2.createTrackbar('R1', 'slider', 0, 255, nothing)
+    #
+    # cv2.createTrackbar('kernel', 'slider', 1, 20, nothing)
+    # cv2.setTrackbarPos('kernel', 'slider', 2)
 
     return uav
 
 
 def filter_image(img, lower_mask, upper_mask):
+    # For calibrating for different backgrounds
     # set sliders to start values
 
-    cv2.setTrackbarPos('B', 'slider', lower_mask[0])
-    cv2.setTrackbarPos('G', 'slider', lower_mask[1])
-    cv2.setTrackbarPos('R', 'slider', lower_mask[2])
-    cv2.setTrackbarPos('B1', 'slider', upper_mask[0])
-    cv2.setTrackbarPos('G1', 'slider', upper_mask[1])
-    cv2.setTrackbarPos('R1', 'slider', upper_mask[2])
+    # cv2.setTrackbarPos('B', 'slider', lower_mask[0])
+    # cv2.setTrackbarPos('G', 'slider', lower_mask[1])
+    # cv2.setTrackbarPos('R', 'slider', lower_mask[2])
+    # cv2.setTrackbarPos('B1', 'slider', upper_mask[0])
+    # cv2.setTrackbarPos('G1', 'slider', upper_mask[1])
+    # cv2.setTrackbarPos('R1', 'slider', upper_mask[2])
 
-    # wait a bit to update
-    cv2.waitKey(5)
+    # # wait a bit to update
+    # cv2.waitKey(5)
 
-    # Read slider positions
-    b = cv2.getTrackbarPos('B', 'slider')
-    g = cv2.getTrackbarPos('G', 'slider')
-    r = cv2.getTrackbarPos('R', 'slider')
-    b1 = cv2.getTrackbarPos('B1', 'slider')
-    g1 = cv2.getTrackbarPos('G1', 'slider')
-    r1 = cv2.getTrackbarPos('R1', 'slider')
-    kernelsize = cv2.getTrackbarPos('kernel', 'slider')
+    # # Read slider positions
+    # b = cv2.getTrackbarPos('B', 'slider')
+    # g = cv2.getTrackbarPos('G', 'slider')
+    # r = cv2.getTrackbarPos('R', 'slider')
+    # b1 = cv2.getTrackbarPos('B1', 'slider')
+    # g1 = cv2.getTrackbarPos('G1', 'slider')
+    # r1 = cv2.getTrackbarPos('R1', 'slider')
+    kernelsize = 2
+    # kernelsize = cv2.getTrackbarPos('kernel', 'slider')
     kernel = np.ones((kernelsize, kernelsize), np.uint8)
+    #
+    # # Build mask array from sliders
+    # lower_unit = np.array([b, g, r])
+    # upper_unit = np.array([b1, g1, r1])
 
-    # Build mask array from sliders
-    lower_unit = np.array([b, g, r])
-    upper_unit = np.array([b1, g1, r1])
-
+    lower_unit = lower_mask
+    upper_unit = upper_mask
     # Convert image to HSV
     hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
 
