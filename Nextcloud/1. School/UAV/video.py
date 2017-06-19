@@ -307,6 +307,9 @@ while True:
                                         while time.time() < timeout:
                                             drone.hover()
 
+                                            ret, img = cam.read()
+                                            cv2.imshow("Image", img)
+
                                         ret, muur = cam.read()
 
                                         if ret:
