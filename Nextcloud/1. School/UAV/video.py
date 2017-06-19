@@ -161,6 +161,7 @@ def takeoff(drone):
             break
 
 
+
 class MoveData:
     def __init__(self, marker, dir_x, speed_x, dir_y, speed_y):
         self.speed_y = speed_y
