@@ -1,0 +1,74 @@
+import numpy as np
+import time
+import cv2
+
+from matplotlib import pyplot as plt
+
+def filter_image(img, lower_mask, upper_mask):
+    # For calibrating for different backgrounds
+    # set sliders to start values
+
+    # cv2.setTrackbarPos('B', 'slider', lower_mask[0])
+    # cv2.setTrackbarPos('G', 'slider', lower_mask[1])
+    # cv2.setTrackbarPos('R', 'slider', lower_mask[2])
+    # cv2.setTrackbarPos('B1', 'slider', upper_mask[0])
+    # cv2.setTrackbarPos('G1', 'slider', upper_mask[1])
+    # cv2.setTrackbarPos('R1', 'slider', upper_mask[2])
+
+    # # wait a bit to update
+    # cv2.waitKey(5)
+
+    # # Read slider positions
+    # b = cv2.getTrackbarPos('B', 'slider')
+    # g = cv2.getTrackbarPos('G', 'slider')
+    # r = cv2.getTrackbarPos('R', 'slider')
+    # b1 = cv2.getTrackbarPos('B1', 'slider')
+    # g1 = cv2.getTrackbarPos('G1', 'slider')
+    # r1 = cv2.getTrackbarPos('R1', 'slider')
+    kernelsize = 2
+    # kernelsize = cv2.getTrackbarPos('kernel', 'slider')
+    kernel = np.ones((kernelsize, kernelsize), np.uint8)
+    #
+    # # Build mask array from sliders
+    # lower_unit = np.array([b, g, r])
+    # upper_unit = np.array([b1, g1, r1])
+
+    lower_unit = lower_mask
+    upper_unit = upper_mask
+    # Convert image to HSV
+    hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
+
+    # Filter colors
+    mask = cv2.inRange(hsv, lower_unit, upper_unit)
+    res = cv2.bitwise_and(img, img, mask=mask)
+    # cv2.imshow("res", res)
+
+    # Convert to grayscale
+    gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
+
+    # Make binary image
+    ret, thres = cv2.threshold(gray, 20, 255, 0)
+
+    # Close some holes
+    thres = cv2.morphologyEx(thres, cv2.MORPH_CLOSE, kernel)
+
+    # Return binary image and slider data, so program remebers their position
+    return thres
+
+cam = cv2.VideoCapture('tcp://192.168.1.1:5555')
+lower_mask = np.array([0, 4, 148])
+upper_mask = np.array([255, 255, 255])
+
+while True:
+    tijd = time.time()
+
+    ret, img = cam.read()
+
+    thres = filter_image(img, lower_mask, upper_mask)
+    cv2.imshow("img", img)
+    cv2.imshow("thres", thres)
+    cv2.imwrite("img.jpg", thres)
+    # plt.hist(thres.ravel(), 256, [0, 256])
+    # plt.show()
+    cv2.waitKey(1)
+    print("tijd: ", time.time()-tijd)

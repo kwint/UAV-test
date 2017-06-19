@@ -186,7 +186,7 @@ ret = True
 nextMarker = 1  # first marker
 maxMarkers = 4  # number of markers +1
 firstMarker = True
-speed = 0.0  # speed of drone
+speed = 0.1  # speed of drone
 
 lookForNextMarker = False
 MarkerFound = False
@@ -199,7 +199,7 @@ movethread = threading.Thread(target=move.droneMove, args=(moveData, drone))
 
 while True:
     # img = cv2.imread("drone/img" + str(i) + ".jpg") # for testing with images
-
+    tijd = time.time()
     ret, img = cam.read()  # Get picture from video feed
     if ret:  # If picture gotten
 
@@ -208,7 +208,8 @@ while True:
         # lower_mask = [b, g, r]
         # upper_mask = [b1, g1, r1]
         thres = filter_image(img, lower_mask, upper_mask)
-        # cv2.imshow("thres", thres)
+        
+        cv2.imshow("thres", thres)
         try:
             im2, contours, hierarchy = cv2.findContours(thres, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -228,14 +229,14 @@ while True:
                 currentContour = component[0]
                 currentHierarchy = component[1]
 
-                if 100 < cv2.contourArea(currentContour) < 50000:
+                if 500 < cv2.contourArea(currentContour) < 50000:
 
                     # print("currentHierarchy: ", currentHierarchy)
                     if currentHierarchy[2] >= 0 and currentHierarchy[3] >= 0:  # if contour has a child and a parent
                         # Draw box around contours
-                        rect = cv2.minAreaRect(currentContour)
-                        box = cv2.boxPoints(rect)
-                        box = np.int0(box)
+                        # rect = cv2.minAreaRect(currentContour)
+                        # box = cv2.boxPoints(rect)
+                        # box = np.int0(box)
 
                         # currentContour should be black square, check if its parent doesnt have a parent and its child
                         # doesnt have a child
@@ -247,9 +248,9 @@ while True:
                             #       cv2.contourArea(MarkerContourInside) / cv2.contourArea(MarkerContourOutside))
 
                             # Draw box around contours
-                            rect2 = cv2.minAreaRect(MarkerContourOutside)
-                            box2 = cv2.boxPoints(rect2)
-                            box2 = np.int0(box2)
+                            # rect2 = cv2.minAreaRect(MarkerContourOutside)
+                            # box2 = cv2.boxPoints(rect2)
+                            # box2 = np.int0(box2)
 
                             # Found and printed marker contours above. Now check for circles in it.
                             circleContour = contours[currentHierarchy[2]]
@@ -262,10 +263,10 @@ while True:
 
                             while True:
                                 print(circleHierarchy)
-                                rect3 = cv2.minAreaRect(circleContour)
-                                box3 = cv2.boxPoints(rect3)
-                                box3 = np.int0(box3)
-                                cv2.drawContours(img, [box3], 0, (255, 0, 0), 2)
+                                # rect3 = cv2.minAreaRect(circleContour)
+                                # box3 = cv2.boxPoints(rect3)
+                                # box3 = np.int0(box3)
+                                # cv2.drawContours(img, [box3], 0, (255, 0, 0), 2)
                                 currentMarker += 1
                                 circleHierarchy = hierarchy[circleHierarchy[0]]
                                 circleContour = contours[circleHierarchy[0]]
@@ -282,6 +283,7 @@ while True:
                                 lookForNextMarker = False
                                 moveData.marker = True
                                 firstMarker = False
+                                tijd3 = time.time()
                                 moments = cv2.moments(MarkerContourOutside)
 
                                 cx = int(moments['m10'] / moments['m00'])
@@ -290,16 +292,21 @@ while True:
                                 dx = cx - 320
                                 dy = cy - 180
                                 distanceToCenter = np.sqrt(dx * dx + dy * dy)
-                                cv2.line(img, (cx, cy), (320, 180), (0, 255, 0), thickness=4)
+                                print("wortel: ", time.time()-tijd3)
+                                # cv2.line(img, (cx, cy), (320, 180), (0, 255, 0), thickness=4)
                                 # print("D: ", distanceToCenter)
                                 if distanceToCenter < 40:  # If close to center, we are above the marker!
                                     nextMarker = currentMarker + 1
                                     print("JAAAA IK BEN OP EEN MARKER, LETS MAKE A PICTURE MATES")
                                     # move.takePicture(drone, currentMarker, 1, cam)
                                     timeout = time.time() + 10
+                                    drone.send(at.CONFIG("video:video_channel", 0))
                                     while time.time() < timeout:
-                                        drone.send(at.CONFIG("video:video_channel", 0))
+
                                         drone.hover()
+
+                                        ret, img = cam.read()
+                                        cv2.imshow("Image", img)
 
                                     ret, muur = cam.read()
 
@@ -327,36 +334,37 @@ while True:
 
                                 if dx > 0:
                                     # move right
-                                    cv2.putText(img, "Move: Right", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
+                                    # cv2.putText(img, "Move: Right", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
                                     moveData.dir_y = 0
 
                                 else:
                                     # move left
-                                    cv2.putText(img, "Move: Left", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
+                                    # cv2.putText(img, "Move: Left", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
                                     moveData.dir_y = 1
                                 if dy > 0:
                                     # move back
-                                    cv2.putText(img, "Move: back", (10, 100), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
+                                    # cv2.putText(img, "Move: back", (10, 100), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
                                     moveData.dir_x = 0
                                 else:
                                     # move left
-                                    cv2.putText(img, "Move: forward", (10, 100), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
+                                    # cv2.putText(img, "Move: forward", (10, 100), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
                                     moveData.dir_x = 1
 
                                 # Print more!
 
-                                cv2.putText(img, str(currentMarker), (10, 50), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 255))
+                                # cv2.putText(img, str(currentMarker), (10, 50), cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 255))
                                 print("marker = ", currentMarker)
 
-                                cv2.drawContours(img, [box2], 0, (0, 255, 255), 2)
-                                cv2.drawContours(img, [box], 0, (255, 255, 255), 2)
+                                # cv2.drawContours(img, [box2], 0, (0, 255, 255), 2)
+                                # cv2.drawContours(img, [box], 0, (255, 255, 255), 2)
                             else:
-                                cv2.drawContours(img, [box2], 0, (0, 0, 0), 2)
-                                cv2.drawContours(img, [box], 0, (0, 0, 0), 2)
+                                # cv2.drawContours(img, [box2], 0, (0, 0, 0), 2)
+                                # cv2.drawContours(img, [box], 0, (0, 0, 0), 2)
+                                pass
 
         cv2.imshow("Image", img)
         cv2.waitKey(1)
-
+        tijd2 = time.time()
         if not movethread.is_alive() and moveData.marker:
             movethread = threading.Thread(target=move.droneMove, args=(moveData, drone))
             movethread.start()
@@ -366,7 +374,5 @@ while True:
             movethread = threading.Thread(target=move.droneMove, args=(moveData, drone))
             movethread.start()
         # time.sleep(3)
-        i = 23
-        # i += 1
-        if i > 35:
-            i = 0
+        print("Alles: ", time.time() - tijd)
+        print("Threads: ",time.time() - tijd2)
