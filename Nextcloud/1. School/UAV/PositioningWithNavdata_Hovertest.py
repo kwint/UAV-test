@@ -10,12 +10,9 @@ def init():
     print("NavData Ready")
     uav.send(at.CONFIG('general:navdata_demo', True))
     time.sleep(0.1)
+    uav.send(at.CONFIG("video:video_channel", 1))
+    time.sleep(0.1)
     print("Battery = ", uav.navdata.demo.vbat_flying_percentage)
-
-    while uav.state.emergency_mask:
-        print("Emergency")
-        uav.send(at.REF(0b0100000000))
-        time.sleep(1)
 
     if uav.state.vbat_low:
         print("Battery to low, please replace before flying")
@@ -54,6 +51,12 @@ def init():
         print("Cutout system detected")
     else:
         print("Self-test: All Clear")
+
+    while uav.state.emergency_mask:
+        print("Emergency")
+        uav.send(at.REF(0b0100000000))
+        time.sleep(1)
+
     return uav
 
 drone = init()
@@ -96,7 +99,7 @@ while True:
 print("Going up")
 previous_time = time.time()
 while altitude < 1800:
-    drone.move(up=0.2)
+    drone.move(up=0.5)
     vx = drone.navdata.demo.vx
     if vx != previous_vx:
         vy = drone.navdata.demo.vy
@@ -119,7 +122,7 @@ drone.move(up=0)
 
 print("Hovering")
 previous_time = time.time()
-timeout = time.time()+5
+timeout = time.time()+3
 while True:
     drone.hover()
 
@@ -145,11 +148,10 @@ while True:
     if time.time() > timeout:
         break
 
-print("Forward")
-timeout = time.time()+5
-altitude = drone.navdata.demo.altitude
+print("Right")
+timeout = time.time()+3
 while True:
-    drone.move(forward=0.1)
+    drone.move(right=0.1)
     vx = drone.navdata.demo.vx
     if vx != previous_vx:
         vy = drone.navdata.demo.vy
@@ -173,7 +175,7 @@ while True:
 
 print("Hovering")
 previous_time = time.time()
-timeout = time.time()+5
+timeout = time.time()+3
 while True:
     drone.hover()
 
@@ -190,17 +192,19 @@ while True:
         new_vy_distance = time_difference * vy
         previous_distance_vy = previous_distance_vy + new_vy_distance
 
-        print("vx = ", new_vx_distance, "\t\t vy = ", new_vy_distance, "\t\t Total x = ", previous_distance_vx,
-              "\t\t Total y = ", previous_distance_vy, "\t\t Altitude = ", altitude)
+        print("vx = ", new_vx_distance, "\t\t\t vy = ", new_vy_distance, "\t\t\t Total x = ", previous_distance_vx,
+              "\t\t\t Total y = ", previous_distance_vy, "\t\t\t Altitude = ", altitude)
 
         previous_vx = vx
         previous_time = time.time()
 
-print("Backward")
-timeout = time.time()+5
-altitude = drone.navdata.demo.altitude
+    if time.time() > timeout:
+        break
+
+print("Left")
+timeout = time.time()+3
 while True:
-    drone.move(backward=0.1)
+    drone.move(left=0.1)
     vx = drone.navdata.demo.vx
     if vx != previous_vx:
         vy = drone.navdata.demo.vy
@@ -224,7 +228,7 @@ while True:
 
 print("Hovering")
 previous_time = time.time()
-timeout = time.time()+5
+timeout = time.time()+2
 while True:
     drone.hover()
 
@@ -255,3 +259,4 @@ while drone.state.fly_mask:
     drone.land()
 
 print("Finished")
+exit()
