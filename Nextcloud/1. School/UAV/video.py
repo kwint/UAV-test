@@ -134,16 +134,23 @@ def filter_image(img, lower_mask, upper_mask):
 
 
 def droneMove(moveData, drone):
-    # TODO insert jeroens dingetje
+    if moveData.dir_x:
+        drone.move(forward=moveData.speed_x)
+    else:
+        drone.move(backward=moveData.speed_x)
+
+    if moveData.dir_y:
+        drone.move(right=moveData.speed_y)
+    else:
+        drone.move(left=moveData.speed_y)
     pass
 
-
 class MoveData:
-    def __init__(self, marker, dirx, speedx, diry, speedy):
-        self.speedy = speedy
-        self.diry = diry
-        self.speedx = speedx
-        self.dirx = dirx
+    def __init__(self, marker, dir_x, speed_x, dir_y, speed_y):
+        self.speed_y = speed_y
+        self.dir_y = dir_y
+        self.speed_x = speed_x
+        self.dir_x = dir_x
         self.marker = marker
 
 
@@ -300,21 +307,20 @@ while True:
                                 if dx > 0:
                                     # move right
                                     cv2.putText(img, "Move: Right", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
-                                    moveData.dirx = 1
+                                    moveData.dir_x = 1
 
                                 else:
                                     # move left
                                     cv2.putText(img, "Move: Left", (10, 80), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
-                                    moveData.dirx = 0
+                                    moveData.dir_x = -1
                                 if dy > 0:
                                     # move back
                                     cv2.putText(img, "Move: back", (10, 100), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
-                                    moveData.diry = 0
+                                    moveData.dir_y = -1
                                 else:
                                     # move left
-                                    cv2.putText(img, "Move: forward", (10, 100), cv2.FONT_HERSHEY_PLAIN, 2,
-                                                (0, 255, 255))
-                                    moveData.diry = 1
+                                    cv2.putText(img, "Move: forward", (10, 100), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 255))
+                                    moveData.dir_y = 1
 
                                 # Print more!
 
