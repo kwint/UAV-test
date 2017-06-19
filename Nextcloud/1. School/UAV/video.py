@@ -139,7 +139,7 @@ def takeoff(drone):
         drone.takeoff()
 
     print("Hovering")
-    timeout = time.time() + 5
+    timeout = time.time() + 10
     while True:
         drone.hover()
         if time.time() > timeout:
@@ -148,12 +148,12 @@ def takeoff(drone):
     print("Going up")
     altitude = drone.navdata.demo.altitude
     while altitude < 1800:
-        drone.move(up=0.5)
+        drone.move(up=0.2)
         altitude = drone.navdata.demo.altitude
     drone.move(up=0)
 
     print("Hovering")
-    timeout = time.time() + 3
+    timeout = time.time() + 5
     while True:
         drone.hover()
 
@@ -170,9 +170,9 @@ class MoveData:
         self.marker = marker
 
 
-print(" 1")
+print("\tStarting Program")
 cam = cv2.VideoCapture('tcp://192.168.1.1:5555')
-print(" 2")
+print("\tVideoCapture ready")
 drone = init()
 
 # Data for debuging
@@ -294,7 +294,10 @@ while True:
                                     lookForNextMarker = True
                                     if nextMarker == maxMarkers:
                                         nextMarker = 1
-                                        drone.land()
+                                        print("Landing")
+                                        while drone.state.fly_mask:
+                                            drone.land()
+                                        exit()
 
                                 if dx > 0:
                                     # move right

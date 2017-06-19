@@ -11,7 +11,7 @@ def takePicture(drone, marker, hight, cam):
     ret, img = cam.read()
 
     if ret:
-        cv2.imwrite("result/"+ str(time.ctime()) + str(marker) + str(hight))
+        cv2.imwrite("result/"+ str(time.ctime()) + str(marker) + str(hight) + ".jpg", img)
         print("saved image")
     time.sleep(0.1)
 
@@ -22,13 +22,12 @@ def takePicture(drone, marker, hight, cam):
 
 def droneMove(moveData, drone):
     print("Hovering")
-    if moveData.marker:
-        timeout = time.time() + 0.5
-        while True:
-            if moveData.dir_x == 1:
-                drone.move(forward=moveData.speed_x)
-            elif moveData.dir_x == 0:
-                drone.move(backward=moveData.speed_x)
+    timeout = time.time() + 0.5
+    while True:
+        if moveData.dir_x:
+            drone.move(forward=moveData.speed_x)
+        else:
+            drone.move(backward=moveData.speed_x)
 
             if moveData.dir_y == 1:
                 drone.move(right=moveData.speed_y)
