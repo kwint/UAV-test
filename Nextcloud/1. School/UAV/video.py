@@ -195,6 +195,7 @@ MarkerFound = False
 moveData = MoveData(False, 0, speed, 0, speed)
 movethread = threading.Thread(target=move.droneMove, args=(moveData, drone))
 
+direction = drone.navdata.demo.psi
 # takeoff(drone)
 
 while True:
@@ -208,7 +209,7 @@ while True:
         # lower_mask = [b, g, r]
         # upper_mask = [b1, g1, r1]
         thres = filter_image(img, lower_mask, upper_mask)
-        
+
         cv2.imshow("thres", thres)
         try:
             im2, contours, hierarchy = cv2.findContours(thres, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
