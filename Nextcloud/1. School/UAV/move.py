@@ -23,7 +23,6 @@ def takePicture(drone, marker, hight, cam):
 
 
 def droneMove(moveData, drone):
-    print("Hovering")
     timeout = time.time() + 0.5
     while True:
         if moveData.marker:
