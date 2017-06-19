@@ -181,6 +181,7 @@ ret = True
 
 nextMarker = 1  # first marker
 maxMarkers = 4  # number of markers +1
+firstMarker = True
 speed = 0.1  # speed of drone
 
 lookForNextMarker = False
@@ -224,7 +225,7 @@ while True:
 
                 if 100 < cv2.contourArea(currentContour) < 50000:
 
-                    print("currentHierarchy: ", currentHierarchy)
+                    # print("currentHierarchy: ", currentHierarchy)
                     if currentHierarchy[2] >= 0 and currentHierarchy[3] >= 0:  # if contour has a child and a parent
                         # Draw box around contours
                         rect = cv2.minAreaRect(currentContour)
@@ -237,8 +238,8 @@ while True:
                             # Probably found a marker, yeey!
                             MarkerContourOutside = contours[currentHierarchy[3]]
                             MarkerContourInside = currentContour
-                            print("Contour area ratio: ",
-                                  cv2.contourArea(MarkerContourInside) / cv2.contourArea(MarkerContourOutside))
+                            # print("Contour area ratio: ",
+                            #       cv2.contourArea(MarkerContourInside) / cv2.contourArea(MarkerContourOutside))
 
                             # Draw box around contours
                             rect2 = cv2.minAreaRect(MarkerContourOutside)
@@ -275,6 +276,7 @@ while True:
                             if currentMarker == nextMarker:
                                 lookForNextMarker = False
                                 moveData.marker = True
+                                firstMarker = False
                                 moments = cv2.moments(MarkerContourOutside)
 
                                 cx = int(moments['m10'] / moments['m00'])
@@ -284,7 +286,7 @@ while True:
                                 dy = cy - 180
                                 distanceToCenter = np.sqrt(dx * dx + dy * dy)
                                 cv2.line(img, (cx, cy), (320, 180), (0, 255, 0), thickness=4)
-                                print("D: ", distanceToCenter)
+                                # print("D: ", distanceToCenter)
                                 if distanceToCenter < 40:  # If close to center, we are above the marker!
                                     nextMarker = currentMarker + 1
                                     print("JAAAA IK BEN OP EEN MARKER, LETS MAKE A PICTURE MATES")
@@ -334,7 +336,7 @@ while True:
             movethread.start()
             moveData.marker = False
 
-        if not movethread.is_alive() and not moveData.marker:
+        if not movethread.is_alive() and not moveData.marker and not firstMarker:
             movethread = threading.Thread(target=move.droneMove, args=(moveData, drone))
             movethread.start()
         # time.sleep(3)
