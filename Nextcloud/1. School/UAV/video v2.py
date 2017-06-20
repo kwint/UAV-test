@@ -149,7 +149,7 @@ def takeoff(drone):
 
     print("Going up")
     altitude = drone.navdata.demo.altitude
-    while altitude < 1800:
+    while altitude < 1200:
         drone.move(up=0.2)
         altitude = drone.navdata.demo.altitude
     drone.move(up=0)
@@ -335,7 +335,12 @@ while True:
                                             goBack = True
                                             nextMarker = 2
 
-                                            # TODO Drone moet omhoog
+                                            print("Going up")
+                                            altitude = drone.navdata.demo.altitude
+                                            while altitude < 2000:
+                                                drone.move(up=0.2)
+                                                altitude = drone.navdata.demo.altitude
+                                            drone.move(up=0)
 
 
                                     if dx > 0:
