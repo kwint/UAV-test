@@ -4,7 +4,7 @@ import numpy as np
 from pyardrone import ARDrone, at
 import threading
 
-import move
+import move2
 
 
 def nothing(x):
