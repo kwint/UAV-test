@@ -372,12 +372,12 @@ while True:
         cv2.waitKey(1)
         tijd2 = time.time()
         if not movethread.is_alive() and moveData.marker:
-            movethread = threading.Thread(target=move.droneMove, args=(moveData, drone, goBack))
+            movethread = threading.Thread(target=move2.droneMove, args=(moveData, drone, goBack))
             movethread.start()
             moveData.marker = False
 
         if not movethread.is_alive() and not moveData.marker and not firstMarker:
-            movethread = threading.Thread(target=move.droneMove, args=(moveData, drone, goBack))
+            movethread = threading.Thread(target=move2.droneMove, args=(moveData, drone, goBack))
             movethread.start()
         # time.sleep(3)
         print("Alles: ", time.time() - tijd)
